@@ -46,10 +46,11 @@ claude plugin install pull-request@juhyeon1114
 - 입력창 근처의 "목차" 버튼으로 패널을 켜고 끈다.
 
 ## 3) writing-format
-설계 문서, ADR, BLUF, SCQA 같은 글쓰기 양식 20개를 모아 두고, 글에 맞는 양식을 골라 쓰게 한다.
+설계 문서, ADR, BLUF, SCQA 같은 글쓰기 양식 20개를 모아 두고, 글에 맞는 양식을 골라 쓰게 한다. 글을 짧게 줄이는 스킬도 들어 있다.
 
 - `/writing-format:analyze`: 글에 어울리는 문서 종류와 글의 짜임 조합을 적합도와 함께 표로 보여준다.
 - `/writing-format:write`: 조합을 고르게 한 뒤 그 양식으로 글을 쓰거나 고친다.
+- `/writing-format:simplify`: 글이나 답변을 중요한 내용만 남겨 짧게 줄인다. "줄여줘", "간단히 써줘"라고 말해도 동작한다.
 - 대상 글을 지정하지 않으면 직전 답변을 다룬다.
 - 양식 목록은 `formats` 스킬에 있어, 기술 글을 쓸 때 Claude가 직접 불러 참고한다.
 

@@ -16,7 +16,7 @@
     {
       "name": "writing-format",
       "source": "./skills/writing-format",
-      "description": "글쓰기 양식 목록과, 글에 맞는 양식을 골라 그 양식으로 쓰거나 고치는 스킬"
+      "description": "글쓰기 양식 목록과, 글을 양식에 맞춰 쓰거나 짧게 줄이는 스킬"
     },
     {
       "name": "pull-request",
