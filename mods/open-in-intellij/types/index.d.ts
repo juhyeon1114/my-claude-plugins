@@ -3,6 +3,10 @@ export type Folders = string[]
 
 declare module 'claude-code' {
   interface PluginState {
-    'open-in-intellij': { folders: Folders }
+    'open-in-intellij': {
+      folders: Folders
+      /** 선택 상자에서 폴더를 고른 횟수 (고를 때마다 선택 상자를 처음 상태로 되돌리는 데 쓴다) */
+      selectPickCount: number
+    }
   }
 }

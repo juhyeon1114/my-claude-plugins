@@ -7,7 +7,23 @@ const INTELLIJ_APP = 'IntelliJ IDEA'
 /** 데스크톱 앱이 폴더를 정하기 전의 세션을 띄워 두는 임시 폴더 */
 const SPARE_SESSION_DIR = '/.claude/spares/'
 
+/** 폴더가 이 개수를 넘으면 버튼 대신 선택 상자 하나로 보여준다 */
+const MAX_FOLDER_BUTTONS = 5
+/** 선택 상자에서 아무 폴더도 고르지 않은 상태를 나타내는 값 */
+const SELECT_PLACEHOLDER = ''
+const SELECT_PLACEHOLDER_LABEL = '폴더 열기'
+const GROUP_BORDER_STYLE = 'round'
+/** 묶음 테두리에 쓰는 반투명 회색 */
+const GROUP_BORDER_COLOR = '#80808060'
+const GROUP_GAP = 1
+const GROUP_PADDING_X = 1
+
 const folders = atom({ plugin: 'open-in-intellij', key: 'folders' } as const, [])
+
+const selectPickCount = atom(
+  { plugin: 'open-in-intellij', key: 'selectPickCount' } as const,
+  0,
+)
 
 /** 실행 인자 한 줄에서 `--add-dir` 값을 하나씩 잡는 패턴 */
 const ADD_DIR_PATTERN = /--add-dir[= ](.+?)(?= --[a-z]|$)/g
@@ -94,27 +110,51 @@ export const register: Register = on => {
     }
 
     const elements = $.ui.resolve(e)
-    const { Box, Button } = elements
+    const { Box, Button, Select } = elements
+    const pickCount = await read($, selectPickCount)
 
     return (
-      <Box gap={1} flexWrap="wrap">
-        {list.map(path => (
-          <Box alignItems="center" gap={1}>
-            {'Svg' in elements && (
-              <elements.Svg
-                source={ICON_SVG}
-                alt="IntelliJ IDEA"
-                width={ICON_SIZE}
-                height={ICON_SIZE}
-              />
-            )}
+      <Box
+        alignItems="center"
+        gap={GROUP_GAP}
+        paddingX={GROUP_PADDING_X}
+        borderStyle={GROUP_BORDER_STYLE}
+        borderColor={GROUP_BORDER_COLOR}
+      >
+        {'Svg' in elements && (
+          <elements.Svg
+            source={ICON_SVG}
+            alt={INTELLIJ_APP}
+            width={ICON_SIZE}
+            height={ICON_SIZE}
+          />
+        )}
+        {list.length > MAX_FOLDER_BUTTONS ? (
+          <Select
+            key={`folder-select-${pickCount}`}
+            options={[
+              { value: SELECT_PLACEHOLDER, label: SELECT_PLACEHOLDER_LABEL },
+              ...list.map(path => ({ value: path, label: folderName(path) })),
+            ]}
+            value={SELECT_PLACEHOLDER}
+            onSelect={async path => {
+              if (path === SELECT_PLACEHOLDER) {
+                return
+              }
+
+              await openInIntelliJ($, path)
+              await update($, selectPickCount, count => count + 1)
+            }}
+          />
+        ) : (
+          list.map(path => (
             <Button
               key={path}
               label={folderName(path)}
               onPress={() => openInIntelliJ($, path)}
             />
-          </Box>
-        ))}
+          ))
+        )}
       </Box>
     )
   })
