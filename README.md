@@ -28,6 +28,14 @@ claude plugin install pull-request@juhyeon1114
 claude plugin install git@juhyeon1114
 ```
 
+```zsh
+claude plugin install session@juhyeon1114
+```
+
+```zsh
+claude plugin install skill@juhyeon1114
+```
+
 # 플러그인
 
 ## 1) open-in-ide
@@ -79,3 +87,10 @@ GitHub PR을 리뷰하거나 PR 글을 쓴다. 결과는 채팅으로만 보여�
 - `/git:push`: 현재 브랜치를 푸시한다. 강제 푸시는 지시했을 때만 한다.
 - 커밋 메시지는 `~/.claude/commit-message.md`가 있으면 그 규칙을 따르고, 없으면 Conventional Commits 형식으로 쓴다.
 - 커밋 스킬은 푸시하지 않고, 푸시 스킬은 커밋하지 않는다.
+
+## 6) session
+- `/session:print-id`: 현재 세션의 Id를 복사하기 쉽게 출력한다.
+
+## 7) skill
+- `/skill:improve <스킬 폴더>`: 스킬을 Anthropic 스킬 작성 모범 사례 체크리스트로 점검하고, 통과하지 못한 항목을 고친다. "스킬 개선해", "스킬 점검해"라고 말해도 동작한다.
+- 점검만 하라고 하면 고치지 않고 표로 보고한다.

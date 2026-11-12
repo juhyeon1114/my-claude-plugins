@@ -1,0 +1,5 @@
+{
+  "name": "skill",
+  "version": "0.1.0",
+  "description": "스킬을 Anthropic 스킬 작성 모범 사례 기준으로 점검하고 고치는 스킬"
+}

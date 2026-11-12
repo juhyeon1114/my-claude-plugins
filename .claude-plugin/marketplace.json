@@ -27,6 +27,16 @@
       "name": "git",
       "source": "./skills/git",
       "description": "커밋, 커밋 메시지 고치기, squash, 푸시를 정해진 규칙대로 하는 스킬"
+    },
+    {
+      "name": "session",
+      "source": "./skills/session",
+      "description": "현재 세션의 Id를 복사하기 쉽게 출력하는 스킬"
+    },
+    {
+      "name": "skill",
+      "source": "./skills/skill",
+      "description": "스킬을 Anthropic 스킬 작성 모범 사례 기준으로 점검하고 고치는 스킬"
     }
   ]
 }

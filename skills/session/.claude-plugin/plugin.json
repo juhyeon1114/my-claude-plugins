@@ -1,0 +1,5 @@
+{
+  "name": "session",
+  "version": "0.1.0",
+  "description": "현재 세션의 Id를 복사하기 쉽게 출력하는 스킬"
+}
