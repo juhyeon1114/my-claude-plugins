@@ -210,7 +210,7 @@ test('걸린 시간을 초, 분 단위 문구로 만든다', () => {
   expect(formatDuration(185_000)).toBe('3분 5초')
 })
 
-test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, 도구 호출 수, 오류 수, 고친 파일을 붙인다', async ($, on) => {
+test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, 도구 호출 수, 오류 수, 고친 파일을 붙이고, 도는 동안에는 테두리를 초록색으로 그린다', async ($, on) => {
   const clock = mock.clock(on)
   on('turn.start', (_, e) => ({ turnId: e.turnId }))
   on('turn.complete', (_, e) => ({ text: e.answer }))
@@ -249,7 +249,9 @@ test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, �
   const textsWhileRunning = (await paneWhileRunning.findAll({ type: 'Text' })).map(
     found => found.text,
   )
-  expect(textsWhileRunning).toContain('진행 중, 도구 2회, 오류 1회, 파일 1개 수정')
+  expect(textsWhileRunning).toContain('도구 2회, 오류 1회, 파일 1개 수정')
+  const boxWhileRunning = await paneWhileRunning.find({ type: 'Box', key: 'reply:0' })
+  expect(boxWhileRunning?.props.borderColor).toBe('#22c55e')
   await paneWhileRunning.unmount()
 
   await $.turn.complete({
@@ -268,6 +270,8 @@ test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, �
       !['턴 전에 있던 응답', '정렬을 고쳤습니다'].includes(text ?? ''),
   )
 
+  const boxAfterTurn = await pane.find({ type: 'Box', key: 'reply:0' })
+  expect(boxAfterTurn?.props.borderColor).toBe('#80808040')
   expect(turnLines).toEqual([
     '정렬을 고쳐줘',
     '1분 5초, 도구 2회, 오류 1회, 파일 1개 수정',
@@ -313,7 +317,7 @@ test('거르는 말이 질문이나 제목에 들어 있는 응답만 그린다'
   await alignReply.unmount()
 })
 
-test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 않는다', async ($, on) => {
+test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 않고, 셸 명령이 시작한 턴에는 명령을 붙인다', async ($, on) => {
   const clock = mock.clock(on)
   on('turn.start', (_, e) => ({ turnId: e.turnId }))
   on('ui.render', ($, e) => {
@@ -338,6 +342,20 @@ test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 �
   const pane = await $.ui.mount(PANE)
   const texts = (await pane.findAll({ type: 'Text' })).map(found => found.text)
   expect(texts).not.toContain('<task-notification>')
+
+  await $.turn.start({
+    text: '<bash-input>claude update</bash-input><bash-stdout>ok</bash-stdout>',
+    turnId: 'turn-2',
+  })
+  const replyToCommand = await $.ui.mount({
+    ...ANSWER,
+    requestId: 'msg_03-t0',
+    props: { text: '업데이트됐습니다', isFirstOfReply: true },
+  })
+  await clock.advance(SAVE_DELAY_MS)
+  const textsAfterCommand = (await pane.findAll({ type: 'Text' })).map(found => found.text)
+  expect(textsAfterCommand).toContain('! claude update')
+  await replyToCommand.unmount()
 
   await pane.unmount()
   await replyDuringTurn.unmount()

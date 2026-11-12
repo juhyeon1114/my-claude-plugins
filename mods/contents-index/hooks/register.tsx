@@ -13,11 +13,15 @@ const TOC_TEXT_SIZE = 'caption'
 const REPLY_BORDER_STYLE = 'round'
 /** 응답 상자 테두리에 쓰는 반투명 회색 */
 const REPLY_BORDER_COLOR = '#80808040'
+/** 도는 중인 턴의 응답 상자 테두리에 쓰는 초록색 */
+const RUNNING_REPLY_BORDER_COLOR = '#22c55e'
 const REPLY_GAP = 'sm'
 const FILTER_INPUT = 'filter'
 const FILTER_PLACEHOLDER = '질문 또는 제목'
-/** `<task-notification>` 처럼 태그 하나로만 된 줄 */
-const TAG_ONLY_LINE = /^<[a-z-]+>$/
+/** `<task-notification>` 처럼 태그로 시작하는 줄 */
+const TAG_LINE = /^<[a-z-]+>/
+/** 사용자가 직접 실행한 셸 명령을 담은 줄 (첫 묶음이 명령) */
+const BASH_INPUT_LINE = /^<bash-input>(.*?)<\/bash-input>/
 const SAVE_DELAY_MS = 50
 /** 턴 정보에 이름을 그대로 보여주는 고친 파일의 최대 개수 */
 const MAX_SHOWN_EDITED_FILES = 3
@@ -190,18 +194,19 @@ async function saveRunningTurn($: EngineInterface, turn: RunningTurn): Promise<v
   scheduleSave($)
 }
 
-/** 턴의 질문에서 글자가 있는 첫 줄을 고른다 (없거나, 태그로 시작하는 알림이면 빈 문자열) */
+/** 턴의 질문에서 글자가 있는 첫 줄을 고른다 (셸 명령이면 `! 명령`, 없거나 그 밖의 태그로 시작하면 빈 문자열) */
 function firstQuestionLine(text: string): string {
   const firstLine = text.split('\n').map(line => line.trim()).find(line => line !== '') ?? ''
+  const command = BASH_INPUT_LINE.exec(firstLine)?.[1]
+  if (command !== undefined) return `! ${command}`
 
-  return TAG_ONLY_LINE.test(firstLine) ? '' : firstLine
+  return TAG_LINE.test(firstLine) ? '' : firstLine
 }
 
-/** 턴의 진행 상태나 걸린 시간, 도구 호출 수, 오류 수, 고친 파일 수를 한 줄로 만든다 (보여줄 것이 없으면 빈 문자열) */
-function summarizeTurn(turn: TurnInfo, isRunning: boolean): string {
-  const elapsed = turn.durationMs === null ? [] : formatDuration(turn.durationMs)
+/** 턴에 걸린 시간, 도구 호출 수, 오류 수, 고친 파일 수를 한 줄로 만든다 (보여줄 것이 없으면 빈 문자열) */
+function summarizeTurn(turn: TurnInfo): string {
   const parts = [
-    isRunning ? '진행 중' : elapsed,
+    turn.durationMs === null ? [] : formatDuration(turn.durationMs),
     turn.toolCount === 0 ? [] : `도구 ${turn.toolCount}회`,
     turn.errorCount === 0 ? [] : `오류 ${turn.errorCount}회`,
     turn.editedFiles.length === 0 ? [] : `파일 ${turn.editedFiles.length}개 수정`,
@@ -392,7 +397,7 @@ export const register: Register = on => {
               key={`reply:${replyIndex}`}
               flexDirection="column"
               borderStyle={REPLY_BORDER_STYLE}
-              borderColor={REPLY_BORDER_COLOR}
+              borderColor={reply.isRunning ? RUNNING_REPLY_BORDER_COLOR : REPLY_BORDER_COLOR}
               paddingX={1}
               overflow="hidden"
             >
@@ -418,10 +423,7 @@ export const register: Register = on => {
               ))}
               {reply.turn !== null && (
                 <Box flexDirection="column" display="none" hover={{ display: 'flex' }}>
-                  {[
-                    summarizeTurn(reply.turn, reply.isRunning),
-                    listEditedFiles(reply.turn.editedFiles),
-                  ]
+                  {[summarizeTurn(reply.turn), listEditedFiles(reply.turn.editedFiles)]
                     .filter(line => line !== '')
                     .map(line => (
                       <Text dimColor size={TOC_TEXT_SIZE} wrap="truncate-end">
