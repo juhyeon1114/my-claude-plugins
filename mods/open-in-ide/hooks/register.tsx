@@ -17,6 +17,8 @@ const MAX_FOLDER_BUTTONS = 5
 const SELECT_PLACEHOLDER = ''
 const SELECT_PLACEHOLDER_LABEL = '폴더 열기'
 const GROUP_GAP = 1
+/** 폴더 목록을 한 번 모은 뒤 다시 모으는 시점 (밀리초) */
+const RECHECK_DELAYS_MS = [1_000, 5_000, 15_000]
 
 const folders = atom({ plugin: 'open-in-ide', key: 'folders' } as const, [])
 
@@ -94,22 +96,31 @@ const refreshFolders = async ($: EngineInterface) => {
   )
 }
 
+/** 폴더 목록을 지금 모으고, 데스크톱 앱이 세션 메타데이터 파일을 늦게 쓰는 경우에 대비해 몇 번 더 모은다 */
+const refreshFoldersWithRechecks = async ($: EngineInterface) => {
+  await refreshFolders($)
+
+  RECHECK_DELAYS_MS.forEach(delayMs => {
+    $.clock.after(delayMs, () => void refreshFolders($))
+  })
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     await restoreIde($)
-    await refreshFolders($)
+    await refreshFoldersWithRechecks($)
 
     return next(e)
   })
 
   on('classic.CwdChanged', async ($, e, next) => {
-    await refreshFolders($)
+    await refreshFoldersWithRechecks($)
 
     return next(e)
   })
 
   on('prompt.submit', async ($, e, next) => {
-    await refreshFolders($)
+    await refreshFoldersWithRechecks($)
 
     return next(e)
   })
