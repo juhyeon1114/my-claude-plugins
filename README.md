@@ -16,6 +16,10 @@ claude plugin install open-in-ide@juhyeon1114
 claude plugin install contents-index@juhyeon1114
 ```
 
+```zsh
+claude plugin install writing-format@juhyeon1114
+```
+
 # 플러그인
 
 ## 1) open-in-ide
@@ -36,3 +40,11 @@ claude plugin install contents-index@juhyeon1114
 - 응답에 마우스를 올리면 그 턴에 걸린 시간, 도구 호출 수, 오류 수, 고친 파일이 펼쳐진다. 도는 중인 턴의 응답은 테두리가 초록색으로 바뀐다.
 - 패널 맨 위의 입력칸에 말을 넣으면 질문이나 제목에 그 말이 들어 있는 응답만 남는다.
 - 입력창 근처의 "목차" 버튼으로 패널을 켜고 끈다.
+
+## 3) writing-format
+설계 문서, ADR, BLUF, SCQA 같은 글쓰기 양식 20개를 모아 두고, 글에 맞는 양식을 골라 쓰게 한다.
+
+- `/writing-format:analyze`: 글에 어울리는 문서 종류와 글의 짜임 조합을 적합도와 함께 표로 보여준다.
+- `/writing-format:write`: 조합을 고르게 한 뒤 그 양식으로 글을 쓰거나 고친다.
+- 대상 글을 지정하지 않으면 직전 답변을 다룬다.
+- 양식 목록은 `formats` 스킬에 있어, 기술 글을 쓸 때 Claude가 직접 불러 참고한다.
