@@ -131,49 +131,49 @@ export const register: Register = on => {
     const ide = findIde(await read($, selectedIde))
 
     return (
-      <Box alignItems="center" justifyContent="flex-start" gap={GROUP_GAP}>
-        {'Svg' in elements && (
-          <Box width={ICON_SIZE} height={ICON_SIZE} flexGrow={0} flexShrink={0}>
+      <Box flexDirection="column">
+        <Box alignItems="center" gap={GROUP_GAP}>
+          {'Svg' in elements && (
             <elements.Svg
               source={ide.icon}
               alt={ide.app}
               width={ICON_SIZE}
               height={ICON_SIZE}
             />
-          </Box>
-        )}
-        <Button
-          key={SWITCH_IDE_BUTTON}
-          label={ide.shortName}
-          dimColor
-          onPress={() => switchIde($)}
-        />
-        {list.length > MAX_FOLDER_BUTTONS ? (
-          <Select
-            key={`folder-select-${pickCount}`}
-            options={[
-              { value: SELECT_PLACEHOLDER, label: SELECT_PLACEHOLDER_LABEL },
-              ...list.map(path => ({ value: path, label: folderName(path) })),
-            ]}
-            value={SELECT_PLACEHOLDER}
-            onSelect={async path => {
-              if (path === SELECT_PLACEHOLDER) {
-                return
-              }
-
-              await openInIde($, ide, path)
-              await update($, selectPickCount, count => count + 1)
-            }}
+          )}
+          <Button
+            key={SWITCH_IDE_BUTTON}
+            label={ide.shortName}
+            dimColor
+            onPress={() => switchIde($)}
           />
-        ) : (
-          list.map(path => (
-            <Button
-              key={path}
-              label={folderName(path)}
-              onPress={() => openInIde($, ide, path)}
+          {list.length > MAX_FOLDER_BUTTONS ? (
+            <Select
+              key={`folder-select-${pickCount}`}
+              options={[
+                { value: SELECT_PLACEHOLDER, label: SELECT_PLACEHOLDER_LABEL },
+                ...list.map(path => ({ value: path, label: folderName(path) })),
+              ]}
+              value={SELECT_PLACEHOLDER}
+              onSelect={async path => {
+                if (path === SELECT_PLACEHOLDER) {
+                  return
+                }
+
+                await openInIde($, ide, path)
+                await update($, selectPickCount, count => count + 1)
+              }}
             />
-          ))
-        )}
+          ) : (
+            list.map(path => (
+              <Button
+                key={path}
+                label={folderName(path)}
+                onPress={() => openInIde($, ide, path)}
+              />
+            ))
+          )}
+        </Box>
       </Box>
     )
   })
