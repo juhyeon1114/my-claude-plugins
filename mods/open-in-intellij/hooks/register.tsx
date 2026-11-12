@@ -1,6 +1,8 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
+import { ICON_SIZE, ICON_SVG } from './icon'
+
 const INTELLIJ_APP = 'IntelliJ IDEA'
 /** 데스크톱 앱이 폴더를 정하기 전의 세션을 띄워 두는 임시 폴더 */
 const SPARE_SESSION_DIR = '/.claude/spares/'
@@ -91,16 +93,27 @@ export const register: Register = on => {
       return next(e)
     }
 
-    const { Box, Button } = $.ui.resolve(e)
+    const elements = $.ui.resolve(e)
+    const { Box, Button } = elements
 
     return (
       <Box gap={1} flexWrap="wrap">
         {list.map(path => (
-          <Button
-            key={path}
-            label={folderName(path)}
-            onPress={() => openInIntelliJ($, path)}
-          />
+          <Box alignItems="center" gap={1}>
+            {'Svg' in elements && (
+              <elements.Svg
+                source={ICON_SVG}
+                alt="IntelliJ IDEA"
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+              />
+            )}
+            <Button
+              key={path}
+              label={folderName(path)}
+              onPress={() => openInIntelliJ($, path)}
+            />
+          </Box>
         ))}
       </Box>
     )
