@@ -131,14 +131,16 @@ export const register: Register = on => {
     const ide = findIde(await read($, selectedIde))
 
     return (
-      <Box alignItems="center" gap={GROUP_GAP}>
+      <Box alignItems="center" justifyContent="flex-start" gap={GROUP_GAP}>
         {'Svg' in elements && (
-          <elements.Svg
-            source={ide.icon}
-            alt={ide.app}
-            width={ICON_SIZE}
-            height={ICON_SIZE}
-          />
+          <Box width={ICON_SIZE} height={ICON_SIZE} flexGrow={0} flexShrink={0}>
+            <elements.Svg
+              source={ide.icon}
+              alt={ide.app}
+              width={ICON_SIZE}
+              height={ICON_SIZE}
+            />
+          </Box>
         )}
         <Button
           key={SWITCH_IDE_BUTTON}
