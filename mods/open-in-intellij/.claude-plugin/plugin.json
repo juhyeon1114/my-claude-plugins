@@ -1,6 +1,0 @@
-{
-  "name": "open-in-intellij",
-  "version": "0.3.0",
-  "description": "세션에 포함된 폴더를 입력창 위에 버튼으로 보여주고, 누르면 IntelliJ IDEA로 연다",
-  "types": "./types/index.d.ts"
-}

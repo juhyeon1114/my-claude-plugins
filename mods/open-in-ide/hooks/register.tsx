@@ -1,9 +1,12 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import { ICON_SIZE, ICON_SVG } from './icon'
+import type { Ide } from './ide'
+import { DEFAULT_IDE_ID, ICON_SIZE, findIde, isIdeId, nextIde } from './ide'
 
-const INTELLIJ_APP = 'IntelliJ IDEA'
+/** 고른 IDE를 세션이 바뀌어도 기억하도록 `$.store` 에 두는 키 */
+const IDE_STORE_KEY = 'ide'
+const SWITCH_IDE_BUTTON = 'switch-ide'
 /** 데스크톱 앱이 폴더를 정하기 전의 세션을 띄워 두는 임시 폴더 */
 const SPARE_SESSION_DIR = '/.claude/spares/'
 
@@ -12,16 +15,17 @@ const MAX_FOLDER_BUTTONS = 5
 /** 선택 상자에서 아무 폴더도 고르지 않은 상태를 나타내는 값 */
 const SELECT_PLACEHOLDER = ''
 const SELECT_PLACEHOLDER_LABEL = '폴더 열기'
-const GROUP_BORDER_STYLE = 'round'
-/** 묶음 테두리에 쓰는 반투명 회색 */
-const GROUP_BORDER_COLOR = '#80808060'
 const GROUP_GAP = 1
-const GROUP_PADDING_X = 1
 
-const folders = atom({ plugin: 'open-in-intellij', key: 'folders' } as const, [])
+const folders = atom({ plugin: 'open-in-ide', key: 'folders' } as const, [])
+
+const selectedIde = atom(
+  { plugin: 'open-in-ide', key: 'ide' } as const,
+  DEFAULT_IDE_ID,
+)
 
 const selectPickCount = atom(
-  { plugin: 'open-in-intellij', key: 'selectPickCount' } as const,
+  { plugin: 'open-in-ide', key: 'selectPickCount' } as const,
   0,
 )
 
@@ -52,18 +56,29 @@ const collectFolders = async ($: EngineInterface): Promise<string[]> => {
 const folderName = (path: string): string =>
   path.split('/').filter(Boolean).pop() ?? path
 
-/** 폴더를 IntelliJ IDEA 로 열고, 실패하면 토스트로 알린다 */
-const openInIntelliJ = async ($: EngineInterface, path: string) => {
-  const { exitCode, stderr } = await $.process.run([
-    'open',
-    '-a',
-    INTELLIJ_APP,
-    path,
-  ])
+/** 폴더를 고른 IDE로 열고, 실패하면 토스트로 알린다 */
+const openInIde = async ($: EngineInterface, ide: Ide, path: string) => {
+  const { exitCode, stderr } = await $.process.run(['open', '-a', ide.app, path])
 
   if (exitCode !== 0) {
-    $.ui.toast(`IntelliJ로 열지 못했습니다: ${stderr.trim() || path}`)
+    $.ui.toast(`${ide.app}로 열지 못했습니다: ${stderr.trim() || path}`)
   }
+}
+
+/** 지난 세션에서 고른 IDE를 `$.store` 에서 읽어 이번 세션에 반영한다 */
+const restoreIde = async ($: EngineInterface) => {
+  const stored = await $.store.get(IDE_STORE_KEY)
+
+  if (isIdeId(stored)) {
+    await update($, selectedIde, () => stored)
+  }
+}
+
+/** 다음 IDE로 바꾸고, 다른 세션에서도 쓰도록 `$.store` 에 남긴다 */
+const switchIde = async ($: EngineInterface) => {
+  const switched = await update($, selectedIde, id => nextIde(id).id)
+
+  await $.store.set(IDE_STORE_KEY, switched)
 }
 
 /** 폴더 목록을 지금 세션 기준으로 다시 모으고, 이미 알던 폴더는 유지한다 */
@@ -79,6 +94,7 @@ const refreshFolders = async ($: EngineInterface) => {
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
+    await restoreIde($)
     await refreshFolders($)
 
     return next(e)
@@ -112,23 +128,24 @@ export const register: Register = on => {
     const elements = $.ui.resolve(e)
     const { Box, Button, Select } = elements
     const pickCount = await read($, selectPickCount)
+    const ide = findIde(await read($, selectedIde))
 
     return (
-      <Box
-        alignItems="center"
-        gap={GROUP_GAP}
-        paddingX={GROUP_PADDING_X}
-        borderStyle={GROUP_BORDER_STYLE}
-        borderColor={GROUP_BORDER_COLOR}
-      >
+      <Box alignItems="center" gap={GROUP_GAP}>
         {'Svg' in elements && (
           <elements.Svg
-            source={ICON_SVG}
-            alt={INTELLIJ_APP}
+            source={ide.icon}
+            alt={ide.app}
             width={ICON_SIZE}
             height={ICON_SIZE}
           />
         )}
+        <Button
+          key={SWITCH_IDE_BUTTON}
+          label={ide.shortName}
+          dimColor
+          onPress={() => switchIde($)}
+        />
         {list.length > MAX_FOLDER_BUTTONS ? (
           <Select
             key={`folder-select-${pickCount}`}
@@ -142,7 +159,7 @@ export const register: Register = on => {
                 return
               }
 
-              await openInIntelliJ($, path)
+              await openInIde($, ide, path)
               await update($, selectPickCount, count => count + 1)
             }}
           />
@@ -151,7 +168,7 @@ export const register: Register = on => {
             <Button
               key={path}
               label={folderName(path)}
-              onPress={() => openInIntelliJ($, path)}
+              onPress={() => openInIde($, ide, path)}
             />
           ))
         )}
