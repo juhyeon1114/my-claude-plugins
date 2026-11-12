@@ -1,0 +1,5 @@
+{
+  "name": "git",
+  "version": "0.1.0",
+  "description": "커밋, 커밋 메시지 고치기, squash, 푸시를 정해진 규칙대로 하는 스킬"
+}

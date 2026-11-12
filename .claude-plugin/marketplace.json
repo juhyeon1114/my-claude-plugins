@@ -22,6 +22,11 @@
       "name": "pull-request",
       "source": "./skills/pull-request",
       "description": "GitHub PR 리뷰, 코멘트 검토, 제목과 본문 작성을 채팅으로만 돕는 스킬"
+    },
+    {
+      "name": "git",
+      "source": "./skills/git",
+      "description": "커밋, 커밋 메시지 고치기, squash, 푸시를 정해진 규칙대로 하는 스킬"
     }
   ]
 }

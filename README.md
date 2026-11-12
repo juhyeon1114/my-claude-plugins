@@ -24,6 +24,10 @@ claude plugin install writing-format@juhyeon1114
 claude plugin install pull-request@juhyeon1114
 ```
 
+```zsh
+claude plugin install git@juhyeon1114
+```
+
 # 플러그인
 
 ## 1) open-in-ide
@@ -63,3 +67,15 @@ GitHub PR을 리뷰하거나 PR 글을 쓴다. 결과는 채팅으로만 보여�
 - `/pull-request:write`: 작업 내용을 보고 PR 제목과 본문 초안을 보여준다.
 - `gh` CLI가 로그인되어 있어야 한다.
 - `review-with-agent`는 `pr-review-toolkit` 플러그인이 있어야 한다. `comment-review`는 있으면 함께 쓴다.
+
+## 5) git
+커밋과 푸시를 정해진 규칙대로 한다. "커밋해", "푸시해"처럼 말해도 동작한다.
+
+- `/git:commit`: 변경 사항을 목적별로 나눠 커밋한다.
+- `/git:commit-one`: 변경 사항을 커밋 하나로 커밋한다.
+- `/git:commit-amend`: 변경 사항을 가장 최근 커밋에 합친다.
+- `/git:commit-reword`: 가장 최근 커밋의 메시지를 변경 내용에 맞게 고친다.
+- `/git:commit-squash`: remote에 올리지 않은 커밋들을 하나로 합친다.
+- `/git:push`: 현재 브랜치를 푸시한다. 강제 푸시는 지시했을 때만 한다.
+- 커밋 메시지는 `~/.claude/commit-message.md`가 있으면 그 규칙을 따르고, 없으면 Conventional Commits 형식으로 쓴다.
+- 커밋 스킬은 푸시하지 않고, 푸시 스킬은 커밋하지 않는다.
