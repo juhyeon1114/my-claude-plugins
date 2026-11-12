@@ -1,8 +1,8 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Heading, ReplyToc } from '../types'
-import { formatElapsed, MINUTE_MS } from './elapsed'
+import type { Heading, ReplyToc, TurnInfo } from '../types'
+import { formatDuration } from './duration'
 import { parseFirstLine, parseHeadings } from './headings'
 
 const PANE = 'contents-index'
@@ -15,12 +15,15 @@ const REPLY_BORDER_STYLE = 'round'
 const REPLY_BORDER_COLOR = '#80808040'
 const REPLY_GAP = 'sm'
 const SAVE_DELAY_MS = 50
+/** 턴 정보에 이름을 그대로 보여주는 고친 파일의 최대 개수 */
+const MAX_SHOWN_EDITED_FILES = 3
+const FILE_EDIT_TOOLS = ['Edit', 'Write']
 const SCROLL_DENIED_TOAST = '이 화면에서는 목차 항목의 위치로 이동할 수 없습니다.'
 
 const replyTocs = atom(
   { plugin: 'contents-index', key: 'replyTocs' } as const,
   [],
-  { shape: 'reply-tocs-2' },
+  { shape: 'reply-tocs-4' },
 )
 
 const isPaneClosed = atom(
@@ -28,13 +31,15 @@ const isPaneClosed = atom(
   false,
 )
 
-const blockSeenAt = atom(
-  { plugin: 'contents-index', key: 'blockSeenAt' } as const,
-  {},
-  { shape: 'block-seen-at-2' },
-)
+const turnInfos = atom({ plugin: 'contents-index', key: 'turnInfos' } as const, {}, {
+  shape: 'turn-infos-1',
+})
 
-const now = atom({ plugin: 'contents-index', key: 'now' } as const, 0)
+const blockTurnIds = atom(
+  { plugin: 'contents-index', key: 'blockTurnIds' } as const,
+  {},
+  { shape: 'block-turn-ids-1' },
+)
 
 /** 그려진 답변 조각 하나에서 뽑은 내용 */
 type Block = {
@@ -52,11 +57,14 @@ const blocks = new Map<string, Block>()
 /** 그려진 답변 조각의 id 가운데 대화 순서로 가장 뒤인 것 (그려진 조각이 없으면 null) */
 let latestRequestId: string | null = null
 
-/** 턴이 도는 동안 대화의 맨 뒤에 새로 나왔고 아직 시각을 기록하지 않은 답변 조각의 id */
-const unstampedBlocks = new Set<string>()
+/** 지금 돌고 있는 메인 대화의 턴 하나 */
+type RunningTurn = { turnId: string; info: TurnInfo }
 
-/** 메인 대화의 턴이 돌고 있는지 여부 */
-let isTurnRunning = false
+/** 지금 돌고 있는 메인 대화의 턴 (돌고 있지 않으면 null) */
+let runningTurn: RunningTurn | null = null
+
+/** 턴이 도는 동안 대화의 맨 뒤에 새로 나왔고 아직 저장하지 않은 답변 조각의 턴 id (키는 조각의 requestId) */
+const unsavedBlockTurnIds = new Map<string, string>()
 
 /** 마지막으로 저장한 목차 목록의 JSON */
 let savedReplyTocsJson = JSON.stringify([])
@@ -83,55 +91,62 @@ function groupBlocksByReply(): Block[][] {
   return replies
 }
 
-/** 응답의 조각 가운데 가장 늦게 기록된 시각을 고른다 (기록된 조각이 없으면 null) */
-function latestSeenAt(reply: Block[], seenAt: Record<string, number>): number | null {
-  const recordedTimes = reply.flatMap(block => seenAt[block.requestId] ?? [])
+/** 목차를 만들 때 응답에 붙이는 기록 */
+type BlockRecords = {
+  /** 답변 조각이 나온 턴의 id (키는 조각의 requestId) */
+  turnIds: Record<string, string>
+  /** 턴의 정보 (키는 턴의 id) */
+  infos: Record<string, TurnInfo>
+}
 
-  return recordedTimes.length > 0 ? Math.max(...recordedTimes) : null
+/** 응답의 조각 가운데 턴이 기록된 첫 조각으로 그 턴의 정보를 찾는다 (기록된 조각이 없으면 null) */
+function findTurnInfo(reply: Block[], records: BlockRecords): TurnInfo | null {
+  const turnId = reply.flatMap(block => records.turnIds[block.requestId] ?? [])[0]
+
+  return turnId === undefined ? null : (records.infos[turnId] ?? null)
 }
 
 /** 응답 하나의 목차를 만든다 (제목이 없는 응답은 마지막 조각의 첫 줄이 항목 하나가 된다) */
-function toReplyToc(reply: Block[], seenAt: Record<string, number>): ReplyToc {
-  const answeredAt = latestSeenAt(reply, seenAt)
+function toReplyToc(reply: Block[], records: BlockRecords): ReplyToc {
+  const turn = findTurnInfo(reply, records)
   const headingEntries = reply.flatMap(block =>
     block.headings.map(heading => ({ ...heading, requestId: block.requestId })),
   )
-  if (headingEntries.length > 0) return { entries: headingEntries, answeredAt }
+  if (headingEntries.length > 0) return { entries: headingEntries, turn }
 
   const lastBlock = reply[reply.length - 1]!
 
   return {
     entries: [{ level: 1, title: lastBlock.firstLine, requestId: lastBlock.requestId }],
-    answeredAt,
+    turn,
   }
 }
 
 /** 모든 응답의 목차를 가장 최근 응답부터 늘어놓는다 */
-function pickReplyTocs(seenAt: Record<string, number>): ReplyToc[] {
+function pickReplyTocs(records: BlockRecords): ReplyToc[] {
   return groupBlocksByReply()
     .reverse()
-    .map(reply => toReplyToc(reply, seenAt))
+    .map(reply => toReplyToc(reply, records))
 }
 
-/** 아직 시각을 기록하지 않은 새 답변 조각에 지금 시각을 기록한다 */
-async function stampNewBlocks($: EngineInterface): Promise<void> {
-  if (unstampedBlocks.size === 0) return
+/** 아직 저장하지 않은 새 답변 조각의 턴 id를 저장한다 */
+async function saveNewBlockTurnIds($: EngineInterface): Promise<void> {
+  if (unsavedBlockTurnIds.size === 0) return
 
-  const stampedAt = await $.clock.now()
-  const newlySeenAt = Object.fromEntries(
-    [...unstampedBlocks].map(requestId => [requestId, stampedAt]),
-  )
-  unstampedBlocks.clear()
+  const newTurnIds = Object.fromEntries(unsavedBlockTurnIds)
+  unsavedBlockTurnIds.clear()
 
-  await update($, blockSeenAt, seenAt => ({ ...seenAt, ...newlySeenAt }))
-  await update($, now, () => stampedAt)
+  await update($, blockTurnIds, turnIds => ({ ...turnIds, ...newTurnIds }))
 }
 
-/** 새 조각의 시각을 기록한 뒤, 고른 목차가 저장된 것과 다르면 저장한다 */
+/** 새 조각의 턴 id를 저장한 뒤, 고른 목차가 저장된 것과 다르면 저장한다 */
 async function saveReplyTocs($: EngineInterface): Promise<void> {
-  await stampNewBlocks($)
+  await saveNewBlockTurnIds($)
 
-  const picked = pickReplyTocs(await read($, blockSeenAt))
+  const picked = pickReplyTocs({
+    turnIds: await read($, blockTurnIds),
+    infos: await read($, turnInfos),
+  })
   const pickedJson = JSON.stringify(picked)
   if (pickedJson === savedReplyTocsJson) return
 
@@ -150,10 +165,35 @@ function scheduleSave($: EngineInterface): void {
   })
 }
 
-/** 지금 시각을 저장해, 경과 시간을 그리는 패널이 다시 그려지게 한다 */
-async function refreshNow($: EngineInterface): Promise<void> {
-  const currentTime = await $.clock.now()
-  await update($, now, () => currentTime)
+/** 돌고 있는 턴의 정보를 저장하고, 목차에 반영되게 한다 */
+async function saveRunningTurn($: EngineInterface, turn: RunningTurn): Promise<void> {
+  await update($, turnInfos, infos => ({ ...infos, [turn.turnId]: turn.info }))
+  scheduleSave($)
+}
+
+/** 턴의 질문에서 글자가 있는 첫 줄을 고른다 (없으면 빈 문자열) */
+function firstQuestionLine(text: string): string {
+  return text.split('\n').map(line => line.trim()).find(line => line !== '') ?? ''
+}
+
+/** 턴에 걸린 시간, 도구 호출 수, 고친 파일 수를 한 줄로 만든다 (보여줄 것이 없으면 빈 문자열) */
+function summarizeTurn(turn: TurnInfo): string {
+  const parts = [
+    turn.durationMs === null ? [] : formatDuration(turn.durationMs),
+    turn.toolCount === 0 ? [] : `도구 ${turn.toolCount}회`,
+    turn.editedFiles.length === 0 ? [] : `파일 ${turn.editedFiles.length}개 수정`,
+  ]
+
+  return parts.flat().join(', ')
+}
+
+/** 고친 파일의 이름을 정해진 개수까지 늘어놓고, 넘는 만큼은 개수로 줄인다 */
+function listEditedFiles(paths: string[]): string {
+  const names = paths.map(path => path.split('/').pop() ?? path)
+  const shown = names.slice(0, MAX_SHOWN_EDITED_FILES).join(', ')
+  const hiddenCount = names.length - MAX_SHOWN_EDITED_FILES
+
+  return hiddenCount > 0 ? `${shown} 외 ${hiddenCount}개` : shown
 }
 
 /** 목차 패널이 그려져 있으면 닫고 아니면 연다 */
@@ -183,20 +223,53 @@ export const register: Register = on => {
     const isClosed = await read($, isPaneClosed)
     if (!isClosed) void $.ui.open({ id: PANE, title: PANE_TITLE })
 
-    void refreshNow($)
-    $.clock.every(MINUTE_MS, () => void refreshNow($))
+    return next(e)
+  })
+
+  on('turn.start', async ($, e, next) => {
+    if (e.agentId !== undefined) return next(e)
+
+    runningTurn = {
+      turnId: e.turnId,
+      info: {
+        question: firstQuestionLine(e.text),
+        durationMs: null,
+        toolCount: 0,
+        editedFiles: [],
+      },
+    }
+    await saveRunningTurn($, runningTurn)
 
     return next(e)
   })
 
-  on('turn.start', ($, e, next) => {
-    if (e.agentId === undefined) isTurnRunning = true
+  on('tool.call', async ($, e, next) => {
+    const ran = await next(e)
+    const turn = runningTurn
+    if (e.agentId !== undefined || turn === null) return ran
 
-    return next(e)
-  })
+    const hasSucceeded = ran.deny === undefined && ran.isError !== true
+    const editedFile =
+      hasSucceeded && FILE_EDIT_TOOLS.includes(e.tool) && 'file_path' in e
+        ? String(e.file_path)
+        : null
+    const editedFiles =
+      editedFile === null || turn.info.editedFiles.includes(editedFile)
+        ? turn.info.editedFiles
+        : [...turn.info.editedFiles, editedFile]
 
-  on('turn.complete', ($, e, next) => {
-    if (e.agentId === undefined) isTurnRunning = false
+    turn.info = { ...turn.info, toolCount: turn.info.toolCount + 1, editedFiles }
+
+    return ran
+  }).catch(($, e, next) => next(e))
+
+  on('turn.complete', async ($, e, next) => {
+    const turn = runningTurn
+    if (e.agentId !== undefined || turn === null) return next(e)
+
+    runningTurn = null
+    turn.info = { ...turn.info, durationMs: e.durationMs }
+    await saveRunningTurn($, turn)
 
     return next(e)
   })
@@ -217,7 +290,9 @@ export const register: Register = on => {
     } else {
       const isAfterEveryKnownBlock =
         latestRequestId !== null && e.requestId > latestRequestId
-      if (isTurnRunning && isAfterEveryKnownBlock) unstampedBlocks.add(e.requestId)
+      if (runningTurn !== null && isAfterEveryKnownBlock) {
+        unsavedBlockTurnIds.set(e.requestId, runningTurn.turnId)
+      }
       if (latestRequestId === null || isAfterEveryKnownBlock) latestRequestId = e.requestId
 
       blocks.set(e.requestId, {
@@ -255,7 +330,6 @@ export const register: Register = on => {
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const { Box, Text, Button } = $.ui.resolve(e)
     const shown = await read($, replyTocs)
-    const currentTime = await read($, now)
 
     if (shown.length === 0) {
       return <Text dimColor>아직 답변이 없습니다.</Text>
@@ -265,8 +339,7 @@ export const register: Register = on => {
       <Box flexDirection="column" gap={REPLY_GAP}>
         {shown.map((reply, replyIndex) => {
           const topLevel = Math.min(...reply.entries.map(entry => entry.level))
-          const elapsed =
-            reply.answeredAt === null ? null : formatElapsed(reply.answeredAt, currentTime)
+          const question = reply.turn?.question ?? ''
 
           return (
             <Box
@@ -277,15 +350,13 @@ export const register: Register = on => {
               paddingX={1}
               overflow="hidden"
             >
+              {question !== '' && (
+                <Text dimColor size={TOC_TEXT_SIZE} wrap="truncate-end">
+                  {question}
+                </Text>
+              )}
               {reply.entries.map((entry, entryIndex) => (
                 <Box gap={1} paddingLeft={(entry.level - topLevel) * INDENT_PER_LEVEL}>
-                  {entryIndex === 0 && elapsed !== null && (
-                    <Box flexShrink={0}>
-                      <Text dimColor size={TOC_TEXT_SIZE} wrap="truncate">
-                        {elapsed}
-                      </Text>
-                    </Box>
-                  )}
                   <Box flexShrink={1} minWidth={0} overflow="hidden">
                     <Button
                       key={`entry:${replyIndex}:${entryIndex}`}
@@ -299,6 +370,17 @@ export const register: Register = on => {
                   </Box>
                 </Box>
               ))}
+              {reply.turn !== null && (
+                <Box flexDirection="column" display="none" hover={{ display: 'flex' }}>
+                  {[summarizeTurn(reply.turn), listEditedFiles(reply.turn.editedFiles)]
+                    .filter(line => line !== '')
+                    .map(line => (
+                      <Text dimColor size={TOC_TEXT_SIZE} wrap="truncate-end">
+                        {line}
+                      </Text>
+                    ))}
+                </Box>
+              )}
             </Box>
           )
         })}

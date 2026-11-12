@@ -1,11 +1,10 @@
 import type { UiPane } from 'claude-code'
 import { expect, mock, test } from 'claude-code/testing'
 
-import { formatElapsed } from '../hooks/elapsed'
+import { formatDuration } from '../hooks/duration'
 import { parseFirstLine, parseHeadings } from '../hooks/headings'
 
 const SAVE_DELAY_MS = 50
-const MINUTE_MS = 60_000
 
 const ANSWER = {
   plugin: 'contents-index',
@@ -206,59 +205,64 @@ test('모드 표시 자리의 목차 버튼은 닫힌 패널을 열고, 열린 �
   await modesWhileOpen.unmount()
 })
 
-test('흐른 시간을 분, 시간, 일 단위 문구로 만든다', () => {
-  const answeredAt = 1_000_000
-
-  expect(formatElapsed(answeredAt, answeredAt + 59_000)).toBe('방금')
-  expect(formatElapsed(answeredAt, answeredAt + 3 * MINUTE_MS)).toBe('3분 전')
-  expect(formatElapsed(answeredAt, answeredAt + 125 * MINUTE_MS)).toBe('2시간 전')
-  expect(formatElapsed(answeredAt, answeredAt + 50 * 60 * MINUTE_MS)).toBe('2일 전')
+test('걸린 시간을 초, 분 단위 문구로 만든다', () => {
+  expect(formatDuration(42_400)).toBe('42초')
+  expect(formatDuration(185_000)).toBe('3분 5초')
 })
 
-test('턴 중에 대화 맨 뒤에 새로 나온 응답에만 경과 시간을 붙이고, 시간이 지나면 문구를 바꾼다', async ($, on) => {
+test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, 도구 호출 수, 고친 파일을 붙인다', async ($, on) => {
   const clock = mock.clock(on)
-  on('ui.open', () => ({ value: { isPlaced: true } }))
-  on('session.start', (_, e) => ({ cwd: e.cwd }))
   on('turn.start', (_, e) => ({ turnId: e.turnId }))
+  on('turn.complete', (_, e) => ({ text: e.answer }))
+  on('tool.call', () => ({ result: {} as never }))
   on('ui.render', ($, e) => {
     const { Text } = $.ui.resolve(e)
 
     return <Text>engine</Text>
   })
-  await $.session.start({ cwd: '/', surface: 'desktop', isInteractive: true })
 
   const replyBeforeTurn = await $.ui.mount({
     ...ANSWER,
     requestId: 'msg_01-t0',
     props: { text: '턴 전에 있던 응답', isFirstOfReply: true },
   })
-  await $.turn.start({ text: '질문', turnId: 'turn-1' })
+  await $.turn.start({ text: '\n정렬을 고쳐줘\n왼쪽으로', turnId: 'turn-1' })
+  const { tool } = $ as unknown as { tool: { call: (input: unknown) => Promise<unknown> } }
+  await tool.call({
+    tool: 'Edit',
+    tool_use_id: 'toolu_1',
+    file_path: '/repo/hooks/register.tsx',
+    old_string: 'a',
+    new_string: 'b',
+  })
+  await tool.call({ tool: 'Bash', tool_use_id: 'toolu_2', command: 'ls' })
   const replyDuringTurn = await $.ui.mount({
     ...ANSWER,
     requestId: 'msg_02-t0',
-    props: { text: '턴 중에 나온 응답', isFirstOfReply: true },
+    props: { text: '정렬을 고쳤습니다', isFirstOfReply: true },
   })
-  const olderReplyDrawnLate = await $.ui.mount({
-    ...ANSWER,
-    requestId: 'msg_00-t0',
-    props: { text: '턴 중에 뒤늦게 그려진 예전 응답', isFirstOfReply: true },
+  await $.turn.complete({
+    answer: '정렬을 고쳤습니다',
+    durationMs: 65_000,
+    isAborted: false,
+    turnId: 'turn-1',
+    reason: 'answer',
   })
   await clock.advance(SAVE_DELAY_MS)
 
-  const paneRightAfter = await $.ui.mount(PANE)
-  const elapsedRightAfter = await paneRightAfter.findAll({ type: 'Text', text: /^(방금|.+ 전)$/ })
-  expect(elapsedRightAfter.map(elapsed => elapsed.text)).toEqual(['방금'])
-  await paneRightAfter.unmount()
+  const pane = await $.ui.mount(PANE)
+  const texts = (await pane.findAll({ type: 'Text' })).map(found => found.text)
+  const turnLines = texts.filter(
+    text => text !== '턴 전에 있던 응답' && text !== '정렬을 고쳤습니다',
+  )
 
-  const fourMinutesAfterSessionStart = 4 * MINUTE_MS
-  await clock.set(fourMinutesAfterSessionStart)
+  expect(turnLines).toEqual([
+    '정렬을 고쳐줘',
+    '1분 5초, 도구 2회, 파일 1개 수정',
+    'register.tsx',
+  ])
 
-  const paneLater = await $.ui.mount(PANE)
-  const elapsedLater = await paneLater.findAll({ type: 'Text', text: /^(방금|.+ 전)$/ })
-  expect(elapsedLater.map(elapsed => elapsed.text)).toEqual(['3분 전'])
-  await paneLater.unmount()
-
-  await olderReplyDrawnLate.unmount()
+  await pane.unmount()
   await replyDuringTurn.unmount()
   await replyBeforeTurn.unmount()
 })
