@@ -20,6 +20,10 @@ claude plugin install contents-index@juhyeon1114
 claude plugin install writing-format@juhyeon1114
 ```
 
+```zsh
+claude plugin install pull-request@juhyeon1114
+```
+
 # 플러그인
 
 ## 1) open-in-ide
@@ -48,3 +52,13 @@ claude plugin install writing-format@juhyeon1114
 - `/writing-format:write`: 조합을 고르게 한 뒤 그 양식으로 글을 쓰거나 고친다.
 - 대상 글을 지정하지 않으면 직전 답변을 다룬다.
 - 양식 목록은 `formats` 스킬에 있어, 기술 글을 쓸 때 Claude가 직접 불러 참고한다.
+
+## 4) pull-request
+GitHub PR을 리뷰하거나 PR 글을 쓴다. 결과는 채팅으로만 보여주고 GitHub에는 쓰지 않는다.
+
+- `/pull-request:review <PR 링크>`: PR을 리뷰하고 리뷰 요약과 코멘트 초안을 보여준다.
+- `/pull-request:review-with-agent <PR 링크>`: `review`에 `pr-review-toolkit` 에이전트 검증을 더한다.
+- `/pull-request:comment-review <코멘트 또는 PR 링크>`: 달린 코멘트가 타당한지 판단하고 답글 초안을 보여준다.
+- `/pull-request:write`: 작업 내용을 보고 PR 제목과 본문 초안을 보여준다.
+- `gh` CLI가 로그인되어 있어야 한다.
+- `review-with-agent`는 `pr-review-toolkit` 플러그인이 있어야 한다. `comment-review`는 있으면 함께 쓴다.

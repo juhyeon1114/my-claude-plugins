@@ -1,0 +1,5 @@
+{
+  "name": "pull-request",
+  "version": "0.1.0",
+  "description": "GitHub PR 리뷰, 코멘트 검토, 제목과 본문 작성을 채팅으로만 돕는 스킬"
+}

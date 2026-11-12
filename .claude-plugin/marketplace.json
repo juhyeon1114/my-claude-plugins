@@ -17,6 +17,11 @@
       "name": "writing-format",
       "source": "./skills/writing-format",
       "description": "글쓰기 양식 목록과, 글에 맞는 양식을 골라 그 양식으로 쓰거나 고치는 스킬"
+    },
+    {
+      "name": "pull-request",
+      "source": "./skills/pull-request",
+      "description": "GitHub PR 리뷰, 코멘트 검토, 제목과 본문 작성을 채팅으로만 돕는 스킬"
     }
   ]
 }
