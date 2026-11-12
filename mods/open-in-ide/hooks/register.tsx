@@ -1,6 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
+import { readDesktopFolders } from './desktop'
 import type { Ide } from './ide'
 import { DEFAULT_IDE_ID, ICON_SIZE, findIde, isIdeId, nextIde } from './ide'
 
@@ -48,9 +49,10 @@ const readAddedFolders = async ($: EngineInterface): Promise<string[]> => {
 /** 세션의 프로젝트 루트와 추가된 폴더를 중복 없이 모은다 */
 const collectFolders = async ($: EngineInterface): Promise<string[]> => {
   const root = await $.session.root()
-  const added = await readAddedFolders($)
+  const addedByArgs = await readAddedFolders($)
+  const addedByDesktop = await readDesktopFolders($).catch(() => [])
 
-  return [...new Set([root, ...added])]
+  return [...new Set([root, ...addedByArgs, ...addedByDesktop])]
 }
 
 const folderName = (path: string): string =>
