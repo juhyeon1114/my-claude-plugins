@@ -1,7 +1,7 @@
 import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
-import type { Heading, ReplyToc, TurnInfo } from '../types'
+import type { Heading, ReplyToc, TocEntry, TurnInfo } from '../types'
 import { formatDuration } from './duration'
 import { parseFirstLine, parseHeadings } from './headings'
 
@@ -14,6 +14,10 @@ const REPLY_BORDER_STYLE = 'round'
 /** 응답 상자 테두리에 쓰는 반투명 회색 */
 const REPLY_BORDER_COLOR = '#80808040'
 const REPLY_GAP = 'sm'
+const FILTER_INPUT = 'filter'
+const FILTER_PLACEHOLDER = '질문 또는 제목'
+/** `<task-notification>` 처럼 태그 하나로만 된 줄 */
+const TAG_ONLY_LINE = /^<[a-z-]+>$/
 const SAVE_DELAY_MS = 50
 /** 턴 정보에 이름을 그대로 보여주는 고친 파일의 최대 개수 */
 const MAX_SHOWN_EDITED_FILES = 3
@@ -23,7 +27,7 @@ const SCROLL_DENIED_TOAST = '이 화면에서는 목차 항목의 위치로 이�
 const replyTocs = atom(
   { plugin: 'contents-index', key: 'replyTocs' } as const,
   [],
-  { shape: 'reply-tocs-4' },
+  { shape: 'reply-tocs-5' },
 )
 
 const isPaneClosed = atom(
@@ -31,8 +35,10 @@ const isPaneClosed = atom(
   false,
 )
 
+const filterText = atom({ plugin: 'contents-index', key: 'filterText' } as const, '')
+
 const turnInfos = atom({ plugin: 'contents-index', key: 'turnInfos' } as const, {}, {
-  shape: 'turn-infos-1',
+  shape: 'turn-infos-2',
 })
 
 const blockTurnIds = atom(
@@ -99,26 +105,31 @@ type BlockRecords = {
   infos: Record<string, TurnInfo>
 }
 
-/** 응답의 조각 가운데 턴이 기록된 첫 조각으로 그 턴의 정보를 찾는다 (기록된 조각이 없으면 null) */
-function findTurnInfo(reply: Block[], records: BlockRecords): TurnInfo | null {
-  const turnId = reply.flatMap(block => records.turnIds[block.requestId] ?? [])[0]
-
-  return turnId === undefined ? null : (records.infos[turnId] ?? null)
+/** 응답의 조각 가운데 턴이 기록된 첫 조각의 턴 id를 찾는다 (기록된 조각이 없으면 null) */
+function findTurnId(reply: Block[], turnIds: Record<string, string>): string | null {
+  return reply.flatMap(block => turnIds[block.requestId] ?? [])[0] ?? null
 }
 
-/** 응답 하나의 목차를 만든다 (제목이 없는 응답은 마지막 조각의 첫 줄이 항목 하나가 된다) */
-function toReplyToc(reply: Block[], records: BlockRecords): ReplyToc {
-  const turn = findTurnInfo(reply, records)
+/** 응답 하나의 목차 항목을 만든다 (제목이 없는 응답은 마지막 조각의 첫 줄이 항목 하나가 된다) */
+function toTocEntries(reply: Block[]): TocEntry[] {
   const headingEntries = reply.flatMap(block =>
     block.headings.map(heading => ({ ...heading, requestId: block.requestId })),
   )
-  if (headingEntries.length > 0) return { entries: headingEntries, turn }
+  if (headingEntries.length > 0) return headingEntries
 
   const lastBlock = reply[reply.length - 1]!
 
+  return [{ level: 1, title: lastBlock.firstLine, requestId: lastBlock.requestId }]
+}
+
+/** 응답 하나의 목차를 만든다 */
+function toReplyToc(reply: Block[], records: BlockRecords): ReplyToc {
+  const turnId = findTurnId(reply, records.turnIds)
+
   return {
-    entries: [{ level: 1, title: lastBlock.firstLine, requestId: lastBlock.requestId }],
-    turn,
+    entries: toTocEntries(reply),
+    turn: turnId === null ? null : (records.infos[turnId] ?? null),
+    isRunning: turnId !== null && turnId === runningTurn?.turnId,
   }
 }
 
@@ -127,6 +138,14 @@ function pickReplyTocs(records: BlockRecords): ReplyToc[] {
   return groupBlocksByReply()
     .reverse()
     .map(reply => toReplyToc(reply, records))
+}
+
+/** 응답의 질문이나 제목에 거르는 말이 들어 있는지 확인한다 (거르는 말이 비어 있으면 참) */
+function matchesFilter(reply: ReplyToc, filter: string): boolean {
+  const word = filter.trim().toLowerCase()
+  const texts = [reply.turn?.question ?? '', ...reply.entries.map(entry => entry.title)]
+
+  return texts.some(text => text.toLowerCase().includes(word))
 }
 
 /** 아직 저장하지 않은 새 답변 조각의 턴 id를 저장한다 */
@@ -171,16 +190,20 @@ async function saveRunningTurn($: EngineInterface, turn: RunningTurn): Promise<v
   scheduleSave($)
 }
 
-/** 턴의 질문에서 글자가 있는 첫 줄을 고른다 (없으면 빈 문자열) */
+/** 턴의 질문에서 글자가 있는 첫 줄을 고른다 (없거나, 태그로 시작하는 알림이면 빈 문자열) */
 function firstQuestionLine(text: string): string {
-  return text.split('\n').map(line => line.trim()).find(line => line !== '') ?? ''
+  const firstLine = text.split('\n').map(line => line.trim()).find(line => line !== '') ?? ''
+
+  return TAG_ONLY_LINE.test(firstLine) ? '' : firstLine
 }
 
-/** 턴에 걸린 시간, 도구 호출 수, 고친 파일 수를 한 줄로 만든다 (보여줄 것이 없으면 빈 문자열) */
-function summarizeTurn(turn: TurnInfo): string {
+/** 턴의 진행 상태나 걸린 시간, 도구 호출 수, 오류 수, 고친 파일 수를 한 줄로 만든다 (보여줄 것이 없으면 빈 문자열) */
+function summarizeTurn(turn: TurnInfo, isRunning: boolean): string {
+  const elapsed = turn.durationMs === null ? [] : formatDuration(turn.durationMs)
   const parts = [
-    turn.durationMs === null ? [] : formatDuration(turn.durationMs),
+    isRunning ? '진행 중' : elapsed,
     turn.toolCount === 0 ? [] : `도구 ${turn.toolCount}회`,
+    turn.errorCount === 0 ? [] : `오류 ${turn.errorCount}회`,
     turn.editedFiles.length === 0 ? [] : `파일 ${turn.editedFiles.length}개 수정`,
   ]
 
@@ -235,6 +258,7 @@ export const register: Register = on => {
         question: firstQuestionLine(e.text),
         durationMs: null,
         toolCount: 0,
+        errorCount: 0,
         editedFiles: [],
       },
     }
@@ -258,7 +282,13 @@ export const register: Register = on => {
         ? turn.info.editedFiles
         : [...turn.info.editedFiles, editedFile]
 
-    turn.info = { ...turn.info, toolCount: turn.info.toolCount + 1, editedFiles }
+    turn.info = {
+      ...turn.info,
+      toolCount: turn.info.toolCount + 1,
+      errorCount: turn.info.errorCount + (ran.isError === true ? 1 : 0),
+      editedFiles,
+    }
+    await saveRunningTurn($, turn)
 
     return ran
   }).catch(($, e, next) => next(e))
@@ -328,15 +358,31 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
-    const { Box, Text, Button } = $.ui.resolve(e)
-    const shown = await read($, replyTocs)
+    const { Box, Text, Button, Input } = $.ui.resolve(e)
+    const replies = await read($, replyTocs)
+    const filter = await read($, filterText)
 
-    if (shown.length === 0) {
+    if (replies.length === 0) {
       return <Text dimColor>아직 답변이 없습니다.</Text>
     }
 
+    const shown = replies.filter(reply => matchesFilter(reply, filter))
+    const saveFilter = (value: string) => void update($, filterText, () => value)
+
     return (
       <Box flexDirection="column" gap={REPLY_GAP}>
+        <Input
+          key={FILTER_INPUT}
+          placeholder={FILTER_PLACEHOLDER}
+          value={filter}
+          onInput={saveFilter}
+          onSubmit={saveFilter}
+        />
+        {shown.length === 0 && (
+          <Text dimColor size={TOC_TEXT_SIZE}>
+            맞는 응답이 없습니다.
+          </Text>
+        )}
         {shown.map((reply, replyIndex) => {
           const topLevel = Math.min(...reply.entries.map(entry => entry.level))
           const question = reply.turn?.question ?? ''
@@ -372,7 +418,10 @@ export const register: Register = on => {
               ))}
               {reply.turn !== null && (
                 <Box flexDirection="column" display="none" hover={{ display: 'flex' }}>
-                  {[summarizeTurn(reply.turn), listEditedFiles(reply.turn.editedFiles)]
+                  {[
+                    summarizeTurn(reply.turn, reply.isRunning),
+                    listEditedFiles(reply.turn.editedFiles),
+                  ]
                     .filter(line => line !== '')
                     .map(line => (
                       <Text dimColor size={TOC_TEXT_SIZE} wrap="truncate-end">

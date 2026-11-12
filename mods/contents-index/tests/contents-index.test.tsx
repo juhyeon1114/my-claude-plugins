@@ -210,11 +210,13 @@ test('걸린 시간을 초, 분 단위 문구로 만든다', () => {
   expect(formatDuration(185_000)).toBe('3분 5초')
 })
 
-test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, 도구 호출 수, 고친 파일을 붙인다', async ($, on) => {
+test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, 도구 호출 수, 오류 수, 고친 파일을 붙인다', async ($, on) => {
   const clock = mock.clock(on)
   on('turn.start', (_, e) => ({ turnId: e.turnId }))
   on('turn.complete', (_, e) => ({ text: e.answer }))
-  on('tool.call', () => ({ result: {} as never }))
+  on('tool.call', (_, e) =>
+    e.tool === 'Bash' ? { result: {} as never, isError: true } : { result: {} as never },
+  )
   on('ui.render', ($, e) => {
     const { Text } = $.ui.resolve(e)
 
@@ -241,6 +243,15 @@ test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, �
     requestId: 'msg_02-t0',
     props: { text: '정렬을 고쳤습니다', isFirstOfReply: true },
   })
+  await clock.advance(SAVE_DELAY_MS)
+
+  const paneWhileRunning = await $.ui.mount(PANE)
+  const textsWhileRunning = (await paneWhileRunning.findAll({ type: 'Text' })).map(
+    found => found.text,
+  )
+  expect(textsWhileRunning).toContain('진행 중, 도구 2회, 오류 1회, 파일 1개 수정')
+  await paneWhileRunning.unmount()
+
   await $.turn.complete({
     answer: '정렬을 고쳤습니다',
     durationMs: 65_000,
@@ -253,14 +264,80 @@ test('턴 중에 나온 응답에는 그 턴의 질문 첫 줄, 걸린 시간, �
   const pane = await $.ui.mount(PANE)
   const texts = (await pane.findAll({ type: 'Text' })).map(found => found.text)
   const turnLines = texts.filter(
-    text => text !== '턴 전에 있던 응답' && text !== '정렬을 고쳤습니다',
+    text =>
+      !['턴 전에 있던 응답', '정렬을 고쳤습니다'].includes(text ?? ''),
   )
 
   expect(turnLines).toEqual([
     '정렬을 고쳐줘',
-    '1분 5초, 도구 2회, 파일 1개 수정',
+    '1분 5초, 도구 2회, 오류 1회, 파일 1개 수정',
     'register.tsx',
   ])
+
+  await pane.unmount()
+  await replyDuringTurn.unmount()
+  await replyBeforeTurn.unmount()
+})
+
+test('거르는 말이 질문이나 제목에 들어 있는 응답만 그린다', async ($, on) => {
+  const clock = mock.clock(on)
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+
+    return <Text>engine</Text>
+  })
+
+  const alignReply = await $.ui.mount({
+    ...ANSWER,
+    requestId: 'msg_01-t0',
+    props: { text: '# 정렬 수정', isFirstOfReply: true },
+  })
+  const iconReply = await $.ui.mount({
+    ...ANSWER,
+    requestId: 'msg_02-t0',
+    props: { text: '# 아이콘 추가', isFirstOfReply: true },
+  })
+  await clock.advance(SAVE_DELAY_MS)
+  const pane = await $.ui.mount(PANE)
+
+  await pane.input({ key: 'filter', text: '아이콘' })
+  const titles = (await pane.findAll({ type: 'Button' })).map(button => button.text)
+  expect(titles).toEqual(['아이콘 추가'])
+
+  await pane.input({ key: 'filter', text: '없는 말' })
+  const textsWithoutMatch = (await pane.findAll({ type: 'Text' })).map(found => found.text)
+  expect(textsWithoutMatch).toEqual(['맞는 응답이 없습니다.'])
+
+  await pane.unmount()
+  await iconReply.unmount()
+  await alignReply.unmount()
+})
+
+test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 않는다', async ($, on) => {
+  const clock = mock.clock(on)
+  on('turn.start', (_, e) => ({ turnId: e.turnId }))
+  on('ui.render', ($, e) => {
+    const { Text } = $.ui.resolve(e)
+
+    return <Text>engine</Text>
+  })
+
+  const replyBeforeTurn = await $.ui.mount({
+    ...ANSWER,
+    requestId: 'msg_01-t0',
+    props: { text: '턴 전에 있던 응답', isFirstOfReply: true },
+  })
+  await $.turn.start({ text: '<task-notification>\n작업이 끝났습니다', turnId: 'turn-1' })
+  const replyDuringTurn = await $.ui.mount({
+    ...ANSWER,
+    requestId: 'msg_02-t0',
+    props: { text: '확인했습니다', isFirstOfReply: true },
+  })
+  await clock.advance(SAVE_DELAY_MS)
+
+  const pane = await $.ui.mount(PANE)
+  const texts = (await pane.findAll({ type: 'Text' })).map(found => found.text)
+  expect(texts).not.toContain('<task-notification>')
 
   await pane.unmount()
   await replyDuringTurn.unmount()
