@@ -3,7 +3,7 @@
 마켓플레이스를 먼저 추가한다.
 
 ```zsh
-claude plugin marketplace add juhyeon1114/claude-plugins
+claude plugin marketplace add juhyeon1114/my-claude-plugins
 ```
 
 그다음 쓰고 싶은 플러그인을 골라 설치한다.
