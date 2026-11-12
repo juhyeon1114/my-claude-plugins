@@ -1,6 +1,6 @@
 {
   "name": "contents-index",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "응답별 목차를 대화 옆 패널에 띄운다",
   "types": "./types/index.d.ts"
 }

@@ -36,7 +36,7 @@ const replyTocs = atom(
 
 const isPaneClosed = atom(
   { plugin: 'contents-index', key: 'isPaneClosed' } as const,
-  false,
+  true,
 )
 
 const filterText = atom({ plugin: 'contents-index', key: 'filterText' } as const, '')
