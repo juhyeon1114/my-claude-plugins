@@ -317,7 +317,7 @@ test('거르는 말이 질문이나 제목에 들어 있는 응답만 그린다'
   await alignReply.unmount()
 })
 
-test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 않고, 셸 명령이 시작한 턴에는 명령을 붙인다', async ($, on) => {
+test('질문에서 태그 묶음은 빼고, 셸 명령이 시작한 턴에는 명령을 붙인다', async ($, on) => {
   const clock = mock.clock(on)
   on('turn.start', (_, e) => ({ turnId: e.turnId }))
   on('ui.render', ($, e) => {
@@ -331,7 +331,10 @@ test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 �
     requestId: 'msg_01-t0',
     props: { text: '턴 전에 있던 응답', isFirstOfReply: true },
   })
-  await $.turn.start({ text: '<task-notification>\n작업이 끝났습니다', turnId: 'turn-1' })
+  await $.turn.start({
+    text: '<task-notification>\n작업이 끝났습니다\n</task-notification>',
+    turnId: 'turn-1',
+  })
   const replyDuringTurn = await $.ui.mount({
     ...ANSWER,
     requestId: 'msg_02-t0',
@@ -356,6 +359,21 @@ test('태그로 시작하는 알림이 시작한 턴에는 질문을 붙이지 �
   const textsAfterCommand = (await pane.findAll({ type: 'Text' })).map(found => found.text)
   expect(textsAfterCommand).toContain('! claude update')
   await replyToCommand.unmount()
+
+  await $.turn.start({
+    text: '<system-reminder>\n연결된 세션 안내\n</system-reminder>\n테스트',
+    turnId: 'turn-3',
+  })
+  const replyToReminded = await $.ui.mount({
+    ...ANSWER,
+    requestId: 'msg_04-t0',
+    props: { text: '잘 받았습니다', isFirstOfReply: true },
+  })
+  await clock.advance(SAVE_DELAY_MS)
+  const textsAfterReminded = (await pane.findAll({ type: 'Text' })).map(found => found.text)
+  expect(textsAfterReminded).toContain('테스트')
+  expect(textsAfterReminded).not.toContain('연결된 세션 안내')
+  await replyToReminded.unmount()
 
   await pane.unmount()
   await replyDuringTurn.unmount()

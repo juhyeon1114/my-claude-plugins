@@ -18,10 +18,10 @@ const RUNNING_REPLY_BORDER_COLOR = '#22c55e'
 const REPLY_GAP = 'sm'
 const FILTER_INPUT = 'filter'
 const FILTER_PLACEHOLDER = '질문 또는 제목'
-/** `<task-notification>` 처럼 태그로 시작하는 줄 */
-const TAG_LINE = /^<[a-z-]+>/
-/** 사용자가 직접 실행한 셸 명령을 담은 줄 (첫 묶음이 명령) */
-const BASH_INPUT_LINE = /^<bash-input>(.*?)<\/bash-input>/
+/** `<system-reminder>` 처럼 같은 이름의 태그로 열고 닫은 묶음 */
+const TAG_BLOCK = /<([a-z-]+)>[\s\S]*?<\/\1>/g
+/** 사용자가 직접 실행한 셸 명령을 담은 묶음 (첫 묶음이 명령) */
+const BASH_INPUT_BLOCK = /<bash-input>([\s\S]*?)<\/bash-input>/
 const SAVE_DELAY_MS = 50
 /** 턴 정보에 이름을 그대로 보여주는 고친 파일의 최대 개수 */
 const MAX_SHOWN_EDITED_FILES = 3
@@ -194,13 +194,17 @@ async function saveRunningTurn($: EngineInterface, turn: RunningTurn): Promise<v
   scheduleSave($)
 }
 
-/** 턴의 질문에서 글자가 있는 첫 줄을 고른다 (셸 명령이면 `! 명령`, 없거나 그 밖의 태그로 시작하면 빈 문자열) */
-function firstQuestionLine(text: string): string {
-  const firstLine = text.split('\n').map(line => line.trim()).find(line => line !== '') ?? ''
-  const command = BASH_INPUT_LINE.exec(firstLine)?.[1]
-  if (command !== undefined) return `! ${command}`
+/** 글에서 글자가 있는 첫 줄을 고른다 (없으면 빈 문자열) */
+function firstFilledLine(text: string): string {
+  return text.split('\n').map(line => line.trim()).find(line => line !== '') ?? ''
+}
 
-  return TAG_LINE.test(firstLine) ? '' : firstLine
+/** 턴의 질문을 한 줄로 고른다 (셸 명령이면 `! 명령`, 아니면 태그 묶음을 뺀 글의 첫 줄) */
+function pickQuestion(text: string): string {
+  const command = BASH_INPUT_BLOCK.exec(text)?.[1]
+  if (command !== undefined) return `! ${firstFilledLine(command)}`
+
+  return firstFilledLine(text.replace(TAG_BLOCK, ''))
 }
 
 /** 턴에 걸린 시간, 도구 호출 수, 오류 수, 고친 파일 수를 한 줄로 만든다 (보여줄 것이 없으면 빈 문자열) */
@@ -260,7 +264,7 @@ export const register: Register = on => {
     runningTurn = {
       turnId: e.turnId,
       info: {
-        question: firstQuestionLine(e.text),
+        question: pickQuestion(e.text),
         durationMs: null,
         toolCount: 0,
         errorCount: 0,
