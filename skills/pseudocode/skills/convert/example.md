@@ -34,7 +34,7 @@ PR을 리뷰할 때는 먼저 PR 설명과 연결된 티켓을 읽는다. 변경
 | "너무 많으면"                                | 값으로 정할 수 있는 것            | 사용자에게 물었다 | 30개를 넘으면          |
 | 사소한 지적이 대부분인데 버그도 있을 때      | 원문에 적히지 않은 경우에 할 일   | 사용자에게 물었다 | 변경 요청을 권한다     |
 | 버그도 없고 사소한 지적이 대부분도 아닐 때   | 원문에 적히지 않은 경우에 할 일   | 사용자에게 물었다 | 의견만 남기기를 권한다 |
-| "필요하면"                                   | 상황을 보고 판단해야 하는 것      | 함수로 뒀다       |                        |
+| "필요하면"                                   | 상황을 보고 판단해야 하는 것      | 이름으로 뒀다     |                        |
 
 "고칠 방법을 아는 경우에는"은 아니면 붙이지 않는다는 뜻이 당연히 따라 나오므로 묻지 않았다.
 
@@ -44,56 +44,49 @@ PR을 리뷰할 때는 먼저 PR 설명과 연결된 티켓을 읽는다. 변경
 # PR 리뷰 지침
 
 ```python
-# 수도코드 지침: 실행할 코드가 아니라 따라야 할 절차다.
-# 정의가 없는 함수는 이름과 주석의 뜻대로 직접 수행한다.
-# 순서와 분기를 적힌 대로 지키고, 뜻을 정할 수 없으면 사용자에게 묻는다.
+# 수도코드 지침: 이름의 뜻대로 직접 하고, 적힌 순서와 분기를 지킨다. 뜻이 모호하면 사용자에게 묻는다.
 
-MAX_FILES = 30
+최대_파일_수 = 30
 
 
-def review_pull_request(pr):
-    """PR을 리뷰한다.
+def PR_리뷰(PR):
+    # 지킬 것: 리뷰 결과는 채팅으로만 보여주고 GitHub에는 쓰지 않는다
 
-    지킬 것:
-    - 리뷰 결과는 채팅으로만 보여주고 GitHub에는 쓰지 않는다.
-    """
-    read(pr.description)
-    read(pr.linked_ticket)
+    읽기(PR_설명)
+    읽기(연결된_티켓)
 
-    files = pr.changed_files
-    if len(files) > MAX_FILES:
-        first_files = ask_user("변경된 파일이 많다. 어디부터 볼까?")
-        files = move_to_front(files, first_files)
+    파일들 = 바뀐_파일들
+    if 파일_수 > 최대_파일_수:
+        먼저_볼_파일 = 사용자에게_묻기("변경된 파일이 많다. 어디부터 볼까?")
+        앞으로_옮기기(먼저_볼_파일)
 
-    findings = []
-    for file in files:
-        file_findings = review_file(file)
-        findings.extend(file_findings)
+    지적_목록 = 빈_목록
+    for 파일 in 파일들:
+        파일의_지적들 = 파일_리뷰(파일)
+        지적_목록에_더하기(파일의_지적들)
 
-    for finding in findings:
-        comment = write_comment(finding)
-        if can_suggest_fix(finding):
-            attach_suggested_code(comment)
-        report(comment)
+    for 지적 in 지적_목록:
+        코멘트 = 코멘트_쓰기(지적)
+        if 고칠_방법을_앎(지적):
+            제안_코드_붙이기(코멘트)
+        보여주기(코멘트)
 
-    verdict = recommend_verdict(findings)
-    report(verdict)
+    결론 = 결론_권하기(지적_목록)
+    보여주기(결론)
 
 
-def review_file(file):
-    """파일 하나에서 지적할 것을 찾는다."""
-    findings = find_problems(file)  # 버그, 빠진 테스트, 이름 짓기
-    for finding in findings:
-        if is_bug(finding) and needs_reproduction(finding):  # 원문: "필요하면"
-            reproduce(finding)
-    return findings
+def 파일_리뷰(파일):
+    지적들 = 문제_찾기(파일)  # 버그, 빠진 테스트, 이름 짓기
+    for 지적 in 지적들:
+        if 지적 == 버그 and 재현_필요함(지적):  # 원문: "필요하면"
+            재현하기(지적)
+    return 지적들
 
 
-def recommend_verdict(findings):
-    """리뷰 결론을 권한다."""
-    if has_bug(findings):
+def 결론_권하기(지적_목록):
+    if 버그_있음(지적_목록):
         return "변경 요청"
-    if is_mostly_minor(findings):
+    if 사소한_지적이_대부분(지적_목록):
         return "승인"
     return "의견만 남기기"
 ```
@@ -105,17 +98,17 @@ def recommend_verdict(findings):
 
 | 원문 규칙                                    | 바꾼 결과의 위치                               | 상태          |
 |----------------------------------------------|------------------------------------------------|---------------|
-| 먼저 PR 설명과 연결된 티켓을 읽는다          | `review_pull_request`의 첫 두 줄               | 같음          |
-| 파일이 너무 많으면 어디부터 볼지 묻는다      | `MAX_FILES`, `ask_user`, `move_to_front`       | 사용자가 정함 |
-| 파일마다 버그, 빠진 테스트, 이름 짓기를 본다 | 첫 번째 `for`와 `find_problems`                | 같음          |
-| 버그로 보이는 것은 필요하면 재현한다         | `review_file`의 `needs_reproduction`           | 같음          |
+| 먼저 PR 설명과 연결된 티켓을 읽는다          | `PR_리뷰`의 두 `읽기`                          | 같음          |
+| 파일이 너무 많으면 어디부터 볼지 묻는다      | `최대_파일_수`, `사용자에게_묻기`, `앞으로_옮기기` | 사용자가 정함 |
+| 파일마다 버그, 빠진 테스트, 이름 짓기를 본다 | 첫 번째 `for`와 `문제_찾기`                    | 같음          |
+| 버그로 보이는 것은 필요하면 재현한다         | `파일_리뷰`의 `재현_필요함`                    | 같음          |
 | 코멘트는 정중하게, 한 가지만 쓴다            | 블록 아래 자연어                               | 같음          |
-| 고칠 방법을 알면 제안 코드를 붙인다          | `can_suggest_fix`                              | 같음          |
-| 채팅으로만 보여주고 GitHub에는 쓰지 않는다   | `지킬 것`                                      | 같음          |
-| 버그가 하나라도 있으면 변경 요청을 권한다    | `recommend_verdict`의 첫 번째 `if`             | 같음          |
-| 사소한 지적이 대부분이면 승인을 권한다       | `recommend_verdict`의 두 번째 `if`             | 같음          |
-| 없음                                         | `recommend_verdict`에서 버그를 먼저 보는 순서  | 사용자가 정함 |
-| 없음                                         | `recommend_verdict`의 마지막 `return`          | 사용자가 정함 |
+| 고칠 방법을 알면 제안 코드를 붙인다          | `고칠_방법을_앎`                               | 같음          |
+| 채팅으로만 보여주고 GitHub에는 쓰지 않는다   | `# 지킬 것:`                                   | 같음          |
+| 버그가 하나라도 있으면 변경 요청을 권한다    | `결론_권하기`의 첫 번째 `if`                   | 같음          |
+| 사소한 지적이 대부분이면 승인을 권한다       | `결론_권하기`의 두 번째 `if`                   | 같음          |
+| 없음                                         | `결론_권하기`에서 버그를 먼저 보는 순서        | 사용자가 정함 |
+| 없음                                         | `결론_권하기`의 마지막 `return`                | 사용자가 정함 |
 
 ## 보여주기
 
@@ -127,8 +120,8 @@ def recommend_verdict(findings):
 - 버그가 있으면 사소한 지적이 대부분이어도 변경 요청을 권한다
 - 버그도 없고 사소한 지적이 대부분도 아니면 의견만 남기기를 권한다
 
-함수로 둔 표현
-- "필요하면": needs_reproduction
+이름으로 둔 표현
+- "필요하면": 재현_필요함
 
 원문 규칙 9개가 모두 들어갔다.
 ```
