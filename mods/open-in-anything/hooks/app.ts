@@ -1,10 +1,10 @@
-import type { IdeId } from '../types'
+import type { AppId } from '../types'
 
 /** 폴더 버튼을 눌렀을 때 폴더를 여는 앱 하나 (IDE 또는 터미널) */
-export type Ide = {
-  id: IdeId
+export type App = {
+  id: AppId
   /** `open -a` 에 넘기는 macOS 앱 이름 */
-  app: string
+  name: string
   /** 전환 버튼에 쓰는 짧은 이름 */
   shortName: string
   /** 묶음 맨 앞에 그리는 아이콘의 SVG 문서 */
@@ -49,41 +49,41 @@ const TERMINAL_ICON = `
 </svg>
 `.trim()
 
-const INTELLIJ: Ide = {
+const INTELLIJ: App = {
   id: 'intellij',
-  app: 'IntelliJ IDEA',
+  name: 'IntelliJ IDEA',
   shortName: 'IJ',
   icon: INTELLIJ_ICON,
 }
 
-const VSCODE: Ide = {
+const VSCODE: App = {
   id: 'vscode',
-  app: 'Visual Studio Code',
+  name: 'Visual Studio Code',
   shortName: 'VS',
   icon: VSCODE_ICON,
 }
 
-const TERMINAL: Ide = {
+const TERMINAL: App = {
   id: 'terminal',
-  app: 'Terminal',
+  name: 'Terminal',
   shortName: 'Term',
   icon: TERMINAL_ICON,
 }
 
 /** 전환 버튼을 누를 때마다 넘어가는 순서대로 둔 목록 */
-const IDES: Ide[] = [INTELLIJ, VSCODE, TERMINAL]
+const APPS: App[] = [INTELLIJ, VSCODE, TERMINAL]
 
-export const DEFAULT_IDE_ID: IdeId = 'intellij'
+export const DEFAULT_APP_ID: AppId = 'intellij'
 
-export const findIde = (id: IdeId): Ide =>
-  IDES.find(ide => ide.id === id) ?? INTELLIJ
+export const findApp = (id: AppId): App =>
+  APPS.find(app => app.id === id) ?? INTELLIJ
 
-/** 전환 버튼을 눌렀을 때 지금 IDE 대신 쓰게 되는 IDE */
-export const nextIde = (id: IdeId): Ide => {
-  const nextIndex = (IDES.findIndex(ide => ide.id === id) + 1) % IDES.length
+/** 전환 버튼을 눌렀을 때 지금 앱 대신 쓰게 되는 앱 */
+export const nextApp = (id: AppId): App => {
+  const nextIndex = (APPS.findIndex(app => app.id === id) + 1) % APPS.length
 
-  return IDES[nextIndex] ?? INTELLIJ
+  return APPS[nextIndex] ?? INTELLIJ
 }
 
-export const isIdeId = (value: unknown): value is IdeId =>
-  IDES.some(ide => ide.id === value)
+export const isAppId = (value: unknown): value is AppId =>
+  APPS.some(app => app.id === value)

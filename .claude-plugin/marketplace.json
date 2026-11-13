@@ -4,8 +4,8 @@
   "owner": { "name": "juhyeon1114" },
   "plugins": [
     {
-      "name": "open-in-ide",
-      "source": "./mods/open-in-ide",
+      "name": "open-in-anything",
+      "source": "./mods/open-in-anything",
       "description": "세션에 포함된 폴더를 입력창 위에 버튼으로 보여주고, 누르면 IntelliJ IDEA나 VS Code, 터미널로 연다"
     },
     {
