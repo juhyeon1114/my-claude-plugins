@@ -21,17 +21,17 @@ const GROUP_GAP = 1
 const RECHECK_DELAYS_MS = [1_000, 5_000, 15_000]
 
 const folders = atom(
-  { plugin: 'open-in-anything', key: 'folders' } as const,
+  { plugin: 'open-in-anything-mac', key: 'folders' } as const,
   [],
 )
 
 const selectedApp = atom(
-  { plugin: 'open-in-anything', key: 'app' } as const,
+  { plugin: 'open-in-anything-mac', key: 'app' } as const,
   DEFAULT_APP_ID,
 )
 
 const selectPickCount = atom(
-  { plugin: 'open-in-anything', key: 'selectPickCount' } as const,
+  { plugin: 'open-in-anything-mac', key: 'selectPickCount' } as const,
   0,
 )
 

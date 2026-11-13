@@ -6,7 +6,7 @@ export type AppId = 'intellij' | 'vscode' | 'terminal'
 
 declare module 'claude-code' {
   interface PluginState {
-    'open-in-anything': {
+    'open-in-anything-mac': {
       folders: Folders
       /** 폴더 버튼을 눌렀을 때 폴더를 여는 앱 */
       app: AppId
