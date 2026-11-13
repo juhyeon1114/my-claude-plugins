@@ -2,7 +2,15 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Draft, DraftStatus } from '../types'
-import { buildConfirmPrompt, buildEditedPrompt, countInputRows } from './prompts'
+import {
+  buildAnswerConvertPrompt,
+  buildAnswerEditedPrompt,
+  buildConfirmPrompt,
+  buildEditedPrompt,
+  countInputRows,
+  parseConvertedReply,
+  WRITING_RULES,
+} from './prompts'
 
 const PANE = 'pseudocode-panel'
 const PANE_TITLE = 'Pseudo'
@@ -15,10 +23,17 @@ const EDIT_BUTTON = 'edit'
 const SEND_BUTTON = 'send-edited'
 const CANCEL_BUTTON = 'cancel-edit'
 const EDIT_INPUT = 'edit-input'
+const ANSWER_BUTTON = 'answer-to-pseudocode'
+const ANSWER_BUTTON_LABEL = 'Pseudo로 보기'
+/** 이보다 짧은 답변 덩어리에는 버튼을 달지 않는다 */
+const MIN_ANSWER_LENGTH = 80
 const CODE_LANGUAGE = 'python'
 const SECTION_GAP = 'sm'
 const EMPTY_CODE_DENY = 'pseudocode가 비어 있다. 수도코드를 넣어 다시 불러라.'
 const EMPTY_EDIT_TOAST = '수도코드가 비어 있어 보내지 않았습니다.'
+const UNCHANGED_ANSWER_TOAST = '고친 곳이 없어 보내지 않았습니다.'
+const CONVERTING_TOAST = '이미 다른 답변을 바꾸는 중입니다.'
+const CONVERT_FAILED_TOAST = '답변을 수도코드로 바꾸지 못했습니다.'
 const POST_FAILED_DENY =
   '수도코드를 패널에 올리지 못했다. 채팅에 수도코드를 보여주고 사용자의 확인을 받아라.'
 
@@ -35,13 +50,7 @@ const TOOL_DESCRIPTION = [
   '- 사용자가 패널에서 확인하거나 고친 수도코드를 보낸 뒤. 다시 부르지 않고 그 절차대로 진행한다.',
   '',
   '쓰는 법',
-  '- Python 문법을 빌려 쓴다. 요청은 def 하나로 쓰고, docstring 첫 줄에 목적을, `지킬 것:` 목록에 내내 지킬 조건을 적는다.',
-  '- 본문에는 무엇을 받아, 무엇을 살피고, 어떤 결과를 내놓는지를 순서대로 쓴다. 분기와 반복이 없는 요청은 if와 for 없이 순서만 쓴다.',
-  '- 범위, 분량, 어조, 형식처럼 사용자가 말한 조건은 코드로 바꾸지 않고 `지킬 것:`에 사용자의 말에 가깝게 적는다.',
-  '- 정의가 없는 함수는 이름의 뜻대로 수행하는 동작이다. 이름은 영어 snake_case로, docstring과 주석은 사용자의 언어로 쓴다.',
-  '- 줄 하나에 동작 하나만 쓴다.',
-  '- 사용자가 말하지 않은 분기나 기본값을 지어내지 않는다. 사용자가 정해야 하는 곳은 `ask_user("질문")`으로 쓴다.',
-  '- pseudocode:syntax 스킬이 있으면 그 문법을 따른다.',
+  ...WRITING_RULES,
   '',
   '부른 뒤',
   '- 작업을 시작하지 않고 턴을 끝낸다. 채팅에는 수도코드를 다시 쓰지 않고, 패널을 확인해 달라고 한 줄만 말한다.',
@@ -63,14 +72,20 @@ const POSTED_RESULT = [
   '사용자가 확인하거나 고치면 새 메시지로 온다.',
 ].join(' ')
 
-const STATUS_TEXTS: Record<DraftStatus, string> = {
+const REQUEST_STATUS_TEXTS: Record<DraftStatus, string> = {
   waiting: '확인을 기다리는 중입니다.',
   confirmed: '이대로 진행하라고 보냈습니다.',
   edited: '고친 내용을 보냈습니다.',
 }
 
+const ANSWER_STATUS_TEXTS: Record<DraftStatus, string> = {
+  waiting: '답변을 수도코드로 바꿨습니다. 고쳐서 보낼 수 있습니다.',
+  confirmed: '답변을 수도코드로 바꿨습니다.',
+  edited: '고친 내용을 보냈습니다.',
+}
+
 const draft = atom({ plugin: 'pseudocode-panel', key: 'draft' } as const, null, {
-  shape: 'draft-1',
+  shape: 'draft-2',
 })
 
 const isEditing = atom({ plugin: 'pseudocode-panel', key: 'isEditing' } as const, false)
@@ -78,6 +93,8 @@ const isEditing = atom({ plugin: 'pseudocode-panel', key: 'isEditing' } as const
 const editText = atom({ plugin: 'pseudocode-panel', key: 'editText' } as const, '')
 
 const isPaneClosed = atom({ plugin: 'pseudocode-panel', key: 'isPaneClosed' } as const, true)
+
+const isConverting = atom({ plugin: 'pseudocode-panel', key: 'isConverting' } as const, false)
 
 /** 수도코드 패널을 연다 */
 async function openPane($: EngineInterface): Promise<void> {
@@ -96,12 +113,37 @@ async function togglePane($: EngineInterface): Promise<void> {
   await update($, isPaneClosed, () => true)
 }
 
-/** Claude가 올린 수도코드를 패널에 새로 올린다 */
+/** 수도코드를 패널에 새로 올린다 */
 async function postDraft($: EngineInterface, posted: Draft): Promise<void> {
   await update($, draft, () => posted)
   await update($, editText, () => posted.code)
   await update($, isEditing, () => false)
   await openPane($)
+}
+
+/** 답변 덩어리 하나를 대화 맥락과 함께 수도코드로 바꿔 패널에 올린다 */
+async function convertAnswer($: EngineInterface, answer: string): Promise<void> {
+  if (await read($, isConverting)) {
+    $.ui.toast(CONVERTING_TOAST)
+
+    return
+  }
+
+  await update($, isConverting, () => true)
+  await openPane($)
+  try {
+    const reply = await $.model.fork({ prompt: buildAnswerConvertPrompt(answer) })
+    const converted = reply.isAnswered ? parseConvertedReply(reply.text) : null
+    if (converted === null || converted.code === '') {
+      $.ui.toast(CONVERT_FAILED_TOAST)
+
+      return
+    }
+
+    await postDraft($, { ...converted, status: 'waiting', source: 'answer' })
+  } finally {
+    await update($, isConverting, () => false)
+  }
 }
 
 /** 확인을 기다리는 수도코드를 그대로 Claude에게 보낸다 */
@@ -114,7 +156,7 @@ async function confirmDraft($: EngineInterface): Promise<void> {
   void $.prompt.submit({ text: buildConfirmPrompt(current.code), asUser: true })
 }
 
-/** 고친 수도코드를 Claude에게 보낸다 (고친 곳이 없으면 그대로 확인한 것으로 보낸다) */
+/** 고친 수도코드를 Claude에게 보낸다 */
 async function sendEdited($: EngineInterface): Promise<void> {
   const current = await read($, draft)
   if (current === null || current.status !== 'waiting') return
@@ -125,14 +167,22 @@ async function sendEdited($: EngineInterface): Promise<void> {
 
     return
   }
-  if (edited === current.code) return confirmDraft($)
 
+  const isUnchanged = edited === current.code
+  if (isUnchanged && current.source === 'request') return confirmDraft($)
+  if (isUnchanged) {
+    $.ui.toast(UNCHANGED_ANSWER_TOAST)
+
+    return
+  }
+
+  const prompt = current.source === 'answer' ? buildAnswerEditedPrompt(edited) : buildEditedPrompt(edited)
   await update($, draft, () => ({ ...current, code: edited, status: 'edited' as const }))
   await update($, isEditing, () => false)
-  void $.prompt.submit({ text: buildEditedPrompt(edited), asUser: true })
+  void $.prompt.submit({ text: prompt, asUser: true })
 }
 
-/** 고치던 내용을 버리고 Claude가 올린 수도코드로 되돌린다 */
+/** 고치던 내용을 버리고 패널에 올라온 수도코드로 되돌린다 */
 async function cancelEdit($: EngineInterface): Promise<void> {
   const current = await read($, draft)
 
@@ -157,7 +207,7 @@ export const register: Register = on => {
     if (code === '') return { deny: EMPTY_CODE_DENY }
 
     const title = typeof e.title === 'string' ? e.title.trim() : ''
-    await postDraft($, { title, code, status: 'waiting' })
+    await postDraft($, { title, code, status: 'waiting', source: 'request' })
 
     return { result: POSTED_RESULT }
   }).catch(() => ({ deny: POST_FAILED_DENY }))
@@ -188,24 +238,52 @@ export const register: Register = on => {
     )
   })
 
+  on('ui.render', { component: 'AssistantMessage' }, async ($, e, next) => {
+    const message = await next(e)
+    if (e.props.text.trim().length < MIN_ANSWER_LENGTH) return message
+
+    const { Box, Button } = $.ui.resolve(e)
+    const answer = e.props.text
+
+    return (
+      <Box flexDirection="column">
+        {message}
+        <Button
+          key={ANSWER_BUTTON}
+          plain
+          dimColor
+          label={ANSWER_BUTTON_LABEL}
+          onPress={() => convertAnswer($, answer)}
+        />
+      </Box>
+    )
+  })
+
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
     const { Box, Text, Button, Input, Code } = $.ui.resolve(e)
     const current = await read($, draft)
+    const converting = await read($, isConverting)
 
     if (current === null) {
-      return <Text dimColor>아직 올라온 수도코드가 없습니다.</Text>
+      const emptyText = converting ? '답변을 수도코드로 바꾸는 중입니다.' : '아직 올라온 수도코드가 없습니다.'
+
+      return <Text dimColor>{emptyText}</Text>
     }
 
     const isWaiting = current.status === 'waiting'
+    const isAnswer = current.source === 'answer'
     const isEditingNow = isWaiting && (await read($, isEditing))
     const editing = await read($, editText)
     const saveEditText = (value: string) => void update($, editText, () => value)
+    const statusText = converting
+      ? '다른 답변을 수도코드로 바꾸는 중입니다.'
+      : (isAnswer ? ANSWER_STATUS_TEXTS : REQUEST_STATUS_TEXTS)[current.status]
 
     return (
       <Box flexDirection="column" gap={SECTION_GAP}>
         {current.title !== '' && <Text bold>{current.title}</Text>}
         <Text dimColor size="caption">
-          {STATUS_TEXTS[current.status]}
+          {statusText}
         </Text>
         {!isEditingNow && <Code source={current.code} language={CODE_LANGUAGE} />}
         {isEditingNow && (
@@ -224,15 +302,17 @@ export const register: Register = on => {
         )}
         {isWaiting && !isEditingNow && (
           <Box gap={1}>
-            <Button
-              key={CONFIRM_BUTTON}
-              variant="primary"
-              label="이대로 진행"
-              onPress={() => confirmDraft($)}
-            />
+            {!isAnswer && (
+              <Button
+                key={CONFIRM_BUTTON}
+                variant="primary"
+                label="이대로 진행"
+                onPress={() => confirmDraft($)}
+              />
+            )}
             <Button
               key={EDIT_BUTTON}
-              variant="secondary"
+              variant={isAnswer ? 'primary' : 'secondary'}
               label="고치기"
               onPress={() => void update($, isEditing, () => true)}
             />
@@ -243,7 +323,7 @@ export const register: Register = on => {
             <Button
               key={SEND_BUTTON}
               variant="primary"
-              label="고친 대로 진행"
+              label={isAnswer ? '고쳐서 보내기' : '고친 대로 진행'}
               onPress={() => sendEdited($)}
             />
             <Button

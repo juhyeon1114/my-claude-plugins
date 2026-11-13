@@ -1,6 +1,6 @@
 {
   "name": "pseudocode-panel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Claude가 요청을 이해한 내용을 수도코드로 대화 옆 패널에 띄우고, 고쳐서 다시 보낼 수 있게 한다",
   "types": "./types/index.d.ts"
 }

@@ -1,6 +1,13 @@
 import { expect, test } from 'claude-code/testing'
 
-import { buildConfirmPrompt, buildEditedPrompt, countInputRows } from '../hooks/prompts'
+import {
+  buildAnswerConvertPrompt,
+  buildAnswerEditedPrompt,
+  buildConfirmPrompt,
+  buildEditedPrompt,
+  countInputRows,
+  parseConvertedReply,
+} from '../hooks/prompts'
 
 const TOOL = 'mcp__pseudocode-panel__show'
 
@@ -147,6 +154,71 @@ test('고치다가 취소하면 올라온 수도코드로 되돌아간다', asyn
   expect((await pane.find({ type: 'Code' }))?.text).toBe(CODE)
   await pane.press({ key: 'edit' })
   expect((await pane.find({ type: 'Input' }))?.text).toBe(CODE)
+  await pane.unmount()
+})
+
+const ANSWER = '이 답변은 버튼이 붙을 만큼 충분히 긴 답변이다. '.repeat(4)
+
+const ANSWER_MESSAGE = {
+  plugin: 'pseudocode-panel',
+  component: 'AssistantMessage',
+  surface: 'desktop',
+  props: { text: ANSWER, isFirstOfReply: true },
+} as const
+
+test('답변을 바꾼 응답에서 제목과 수도코드를 꺼낸다', () => {
+  expect(parseConvertedReply(`제목: 커밋\n\n\`\`\`python\n${CODE}\n\`\`\``)).toEqual({ title: '커밋', code: CODE })
+  expect(parseConvertedReply(CODE)).toEqual({ title: '', code: CODE })
+})
+
+test('짧은 답변에는 버튼을 달지 않는다', async $ => {
+  const message = await $.ui.mount({ ...ANSWER_MESSAGE, props: { text: '네.', isFirstOfReply: true } })
+
+  expect(await message.findAll({ type: 'Button' })).toEqual([])
+  await message.unmount()
+})
+
+test('답변의 버튼을 누르면 대화 맥락으로 바꾼 수도코드가 패널에 뜬다', async ($, on) => {
+  const forkPrompts: string[] = []
+  on('ui.open', () => ({ value: { isPlaced: true } }))
+  on('model.fork', (_, e) => {
+    forkPrompts.push(e.prompt)
+
+    return { value: { isAnswered: true, text: `제목: 답변 요약\n\n${CODE}`, usage: {} } } as never
+  })
+
+  const message = await $.ui.mount(ANSWER_MESSAGE)
+  await message.press({ key: 'answer-to-pseudocode' })
+  const pane = await $.ui.mount(PANE)
+  const buttons = (await pane.findAll({ type: 'Button' })).map(found => found.text)
+
+  expect(forkPrompts).toEqual([buildAnswerConvertPrompt(ANSWER)])
+  expect((await pane.find({ type: 'Code' }))?.text).toBe(CODE)
+  expect(buttons).toEqual(['고치기'])
+  await message.unmount()
+  await pane.unmount()
+})
+
+test('답변을 바꾼 수도코드를 고쳐서 보내면 답변 수정 글을 보낸다', async ($, on) => {
+  const submitted: string[] = []
+  on('ui.open', () => ({ value: { isPlaced: true } }))
+  on('model.fork', () => ({ value: { isAnswered: true, text: CODE, usage: {} } }) as never)
+  on('prompt.submit', (_, e) => {
+    submitted.push(e.text)
+
+    return { text: e.text }
+  })
+
+  const message = await $.ui.mount(ANSWER_MESSAGE)
+  await message.press({ key: 'answer-to-pseudocode' })
+  const pane = await $.ui.mount(PANE)
+  await pane.press({ key: 'edit' })
+  await pane.press({ key: 'send-edited' })
+  await pane.input({ key: 'edit-input', text: EDITED_CODE, kind: 'change' })
+  await pane.press({ key: 'send-edited' })
+
+  expect(submitted).toEqual([buildAnswerEditedPrompt(EDITED_CODE)])
+  await message.unmount()
   await pane.unmount()
 })
 
