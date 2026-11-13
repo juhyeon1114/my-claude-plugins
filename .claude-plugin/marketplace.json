@@ -37,6 +37,11 @@
       "name": "skill",
       "source": "./skills/skill",
       "description": "스킬을 Anthropic 스킬 작성 모범 사례 기준으로 점검하고 고치는 스킬"
+    },
+    {
+      "name": "pseudocode",
+      "source": "./skills/pseudocode",
+      "description": "지침에서 수도코드로 쓸 절차를 찾고, 자연어 지침을 수도코드로 바꾸고, 수도코드 지침을 해석하는 스킬"
     }
   ]
 }
