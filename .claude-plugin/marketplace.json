@@ -6,7 +6,7 @@
     {
       "name": "open-in-anything-mac",
       "source": "./mods/open-in-anything-mac",
-      "description": "세션에 포함된 폴더를 입력창 위에 버튼으로 보여주고, 누르면 IntelliJ IDEA나 VS Code, 터미널로 연다 (macOS 전용)"
+      "description": "세션에 포함된 폴더를 입력창 위에 버튼으로 보여주고, 누르면 IntelliJ IDEA나 VS Code, 터미널, GitHub로 연다 (macOS 전용)"
     },
     {
       "name": "contents-index",

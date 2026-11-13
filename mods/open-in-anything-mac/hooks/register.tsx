@@ -4,6 +4,7 @@ import type { EngineInterface, Register } from 'claude-code'
 import { readDesktopFolders } from './desktop'
 import type { App } from './app'
 import { DEFAULT_APP_ID, ICON_SIZE, findApp, isAppId, nextApp } from './app'
+import { readGithubUrl } from './github'
 
 /** 고른 앱을 세션이 바뀌어도 기억하도록 `$.store` 에 두는 키 */
 const APP_STORE_KEY = 'app'
@@ -63,8 +64,8 @@ const collectFolders = async ($: EngineInterface): Promise<string[]> => {
 const folderName = (path: string): string =>
   path.split('/').filter(Boolean).pop() ?? path
 
-/** 폴더를 고른 앱으로 열고, 실패하면 토스트로 알린다 */
-const openInApp = async ($: EngineInterface, app: App, path: string) => {
+/** 폴더를 macOS 앱으로 열고, 실패하면 토스트로 알린다 */
+const openInMacApp = async ($: EngineInterface, app: App, path: string) => {
   const { exitCode, stderr } = await $.process.run([
     'open',
     '-a',
@@ -76,6 +77,23 @@ const openInApp = async ($: EngineInterface, app: App, path: string) => {
     $.ui.toast(`${app.name}로 열지 못했습니다: ${stderr.trim() || path}`)
   }
 }
+
+/** 폴더가 속한 GitHub 저장소 페이지를 기본 브라우저로 열고, 저장소를 찾지 못하면 토스트로 알린다 */
+const openInGithub = async ($: EngineInterface, path: string) => {
+  const url = await readGithubUrl($, path)
+
+  if (url === undefined) {
+    $.ui.toast(`GitHub 저장소를 찾지 못했습니다: ${path}`)
+
+    return
+  }
+
+  await $.process.run(['open', url])
+}
+
+/** 폴더를 고른 앱으로 연다 */
+const openFolder = ($: EngineInterface, app: App, path: string) =>
+  app.id === 'github' ? openInGithub($, path) : openInMacApp($, app, path)
 
 /** 지난 세션에서 고른 앱을 `$.store` 에서 읽어 이번 세션에 반영한다 */
 const restoreApp = async ($: EngineInterface) => {
@@ -181,7 +199,7 @@ export const register: Register = on => {
                   return
                 }
 
-                await openInApp($, app, path)
+                await openFolder($, app, path)
                 await update($, selectPickCount, count => count + 1)
               }}
             />
@@ -190,7 +208,7 @@ export const register: Register = on => {
               <Button
                 key={path}
                 label={folderName(path)}
-                onPress={() => openInApp($, app, path)}
+                onPress={() => openFolder($, app, path)}
               />
             ))
           )}

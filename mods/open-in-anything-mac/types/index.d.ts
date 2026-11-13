@@ -2,7 +2,7 @@
 export type Folders = string[]
 
 /** 폴더를 여는 데 쓸 수 있는 앱의 식별자 */
-export type AppId = 'intellij' | 'vscode' | 'terminal'
+export type AppId = 'intellij' | 'vscode' | 'terminal' | 'github'
 
 declare module 'claude-code' {
   interface PluginState {
