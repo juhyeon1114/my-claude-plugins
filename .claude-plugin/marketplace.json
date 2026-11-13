@@ -14,11 +14,6 @@
       "description": "응답별 목차를 대화 옆 패널에 띄운다"
     },
     {
-      "name": "pseudocode-panel",
-      "source": "./mods/pseudocode-panel",
-      "description": "Claude가 요청을 이해한 내용을 수도코드로 대화 옆 패널에 띄우고, 고쳐서 다시 보낼 수 있게 한다"
-    },
-    {
       "name": "writing-format",
       "source": "./skills/writing-format",
       "description": "글쓰기 양식 목록과, 글을 양식에 맞춰 쓰거나 짧게 줄이는 스킬"
