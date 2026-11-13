@@ -38,11 +38,11 @@ const VSCODE_ICON = `
 </svg>
 `.trim()
 
-/** 어두운 상자 안에 흰색 프롬프트 꺾쇠와 밑줄을 그린 아이콘 */
+/** 어두운 상자 안에 연두색 프롬프트 꺾쇠와 밑줄을 그린 아이콘 */
 const TERMINAL_ICON = `
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 320">
   <rect width="320" height="320" rx="56" fill="#2D2D2D"/>
-  <g fill="none" stroke="#FFFFFF" stroke-width="26" stroke-linejoin="round" stroke-linecap="round">
+  <g fill="none" stroke="#00FF41" stroke-width="26" stroke-linejoin="round" stroke-linecap="round">
     <path d="M72 100L144 160L72 220"/>
     <path d="M170 224H250"/>
   </g>
