@@ -39,11 +39,12 @@ claude plugin install skill@juhyeon1114
 # 플러그인
 
 ## 1) open-in-ide
-세션에 포함된 폴더를 입력창 위에 버튼으로 보여준다. 버튼을 누르면 그 폴더를 IntelliJ IDEA나 VS Code로 연다.
+세션에 포함된 폴더를 입력창 위에 버튼으로 보여준다. 버튼을 누르면 그 폴더를 IntelliJ IDEA나 VS Code, 터미널로 연다.
 
 - 프로젝트 루트와 `--add-dir`로 추가한 폴더가 버튼으로 나온다.
 - macOS에서만 동작한다.
-- 맨 앞의 `IJ`, `VS` 버튼을 누르면 여는 IDE가 바뀐다. 고른 IDE는 다음 세션에도 유지된다.
+- 맨 앞의 버튼을 누를 때마다 여는 앱이 `IJ`, `VS`, `Term` 순서로 바뀐다. 고른 앱은 다음 세션에도 유지된다.
+- `Term`을 고르면 macOS 기본 터미널 앱에서 그 폴더로 새 창이 열린다.
 - 폴더가 5개를 넘으면 버튼 대신 선택 상자 하나로 나온다.
 - 쓰려는 IDE(IntelliJ IDEA, Visual Studio Code)가 설치되어 있어야 한다.
 
