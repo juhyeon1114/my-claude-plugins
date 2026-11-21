@@ -37,6 +37,11 @@
       "name": "skill",
       "source": "./skills/skill",
       "description": "스킬을 Anthropic 스킬 작성 모범 사례 기준으로 점검하고 고치는 스킬"
+    },
+    {
+      "name": "invest",
+      "source": "./skills/invest",
+      "description": "토스증권, 한국투자증권(KIS), Finviz로 국내와 미국 시장, 종목을 분석하는 스킬 (거래 기능 없음)"
     }
   ]
 }

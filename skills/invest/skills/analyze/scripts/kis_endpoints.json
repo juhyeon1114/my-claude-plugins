@@ -1,0 +1,1067 @@
+{
+ "/uapi/domestic-stock/v1/quotations/inquire-price": {
+  "tr_id": "FHKST01010100",
+  "title": "[국내주식] 기본시세 > 주식현재가 시세[v1_국내주식-008]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_price/inquire_price.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-price-2": {
+  "tr_id": "FHPST01010000",
+  "title": "[국내주식] 기본시세 > 주식현재가 시세2[v1_국내주식-054]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_price_2/inquire_price_2.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-asking-price-exp-ccn": {
+  "tr_id": "FHKST01010200",
+  "title": "[국내주식] 기본시세 > 주식현재가 호가/예상체결[v1_국내주식-011]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_asking_price_exp_ccn/inquire_asking_price_exp_ccn.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-ccnl": {
+  "tr_id": "FHKST01010300",
+  "title": "[국내주식] 기본시세 > 주식현재가 체결[v1_국내주식-009]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_ccnl/inquire_ccnl.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-daily-price": {
+  "tr_id": "FHKST01010400",
+  "title": "[국내주식] 기본시세 > 주식현재가 일자별[v1_국내주식-010]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_PERIOD_DIV_CODE": "D",
+   "FID_ORG_ADJ_PRC": "1"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_price/inquire_daily_price.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-daily-itemchartprice": {
+  "tr_id": "FHKST03010100",
+  "title": "[국내주식] 기본시세 > 국내주식기간별시세(일/주/월/년)[v1_국내주식-016]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": "",
+   "FID_PERIOD_DIV_CODE": "D",
+   "FID_ORG_ADJ_PRC": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_itemchartprice/inquire_daily_itemchartprice.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-time-itemchartprice": {
+  "tr_id": "FHKST03010200",
+  "title": "[국내주식] 기본시세 > 주식당일분봉조회[v1_국내주식-022]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_HOUR_1": "",
+   "FID_PW_DATA_INCU_YN": "Y",
+   "FID_ETC_CLS_CODE": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_time_itemchartprice/inquire_time_itemchartprice.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-time-dailychartprice": {
+  "tr_id": "FHKST03010230",
+  "title": "[국내주식] 기본시세 > 주식일별분봉조회 [국내주식-213]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_HOUR_1": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_PW_DATA_INCU_YN": "",
+   "FID_FAKE_TICK_INCU_YN": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_time_dailychartprice/inquire_time_dailychartprice.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/intstock-multprice": {
+  "tr_id": "FHKST11300006",
+  "title": "[국내주식] 시세분석 > 관심종목(멀티종목) 시세조회 [국내주식-205]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE_1": "J",
+   "FID_INPUT_ISCD_1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/intstock_multprice/intstock_multprice.py",
+  "extra_params": [
+   "FID_COND_MRKT_DIV_CODE_2",
+   "FID_INPUT_ISCD_2",
+   "FID_COND_MRKT_DIV_CODE_3",
+   "FID_INPUT_ISCD_3",
+   "FID_COND_MRKT_DIV_CODE_4",
+   "FID_INPUT_ISCD_4",
+   "FID_COND_MRKT_DIV_CODE_5",
+   "FID_INPUT_ISCD_5",
+   "FID_COND_MRKT_DIV_CODE_6",
+   "FID_INPUT_ISCD_6",
+   "FID_COND_MRKT_DIV_CODE_7",
+   "FID_INPUT_ISCD_7",
+   "FID_COND_MRKT_DIV_CODE_8",
+   "FID_INPUT_ISCD_8",
+   "FID_COND_MRKT_DIV_CODE_9",
+   "FID_INPUT_ISCD_9",
+   "FID_COND_MRKT_DIV_CODE_10",
+   "FID_INPUT_ISCD_10",
+   "FID_COND_MRKT_DIV_CODE_11",
+   "FID_INPUT_ISCD_11",
+   "FID_COND_MRKT_DIV_CODE_12",
+   "FID_INPUT_ISCD_12",
+   "FID_COND_MRKT_DIV_CODE_13",
+   "FID_INPUT_ISCD_13",
+   "FID_COND_MRKT_DIV_CODE_14",
+   "FID_INPUT_ISCD_14",
+   "FID_COND_MRKT_DIV_CODE_15",
+   "FID_INPUT_ISCD_15",
+   "FID_COND_MRKT_DIV_CODE_16",
+   "FID_INPUT_ISCD_16",
+   "FID_COND_MRKT_DIV_CODE_17",
+   "FID_INPUT_ISCD_17",
+   "FID_COND_MRKT_DIV_CODE_18",
+   "FID_INPUT_ISCD_18",
+   "FID_COND_MRKT_DIV_CODE_19",
+   "FID_INPUT_ISCD_19",
+   "FID_COND_MRKT_DIV_CODE_20",
+   "FID_INPUT_ISCD_20",
+   "FID_COND_MRKT_DIV_CODE_21",
+   "FID_INPUT_ISCD_21",
+   "FID_COND_MRKT_DIV_CODE_22",
+   "FID_INPUT_ISCD_22",
+   "FID_COND_MRKT_DIV_CODE_23",
+   "FID_INPUT_ISCD_23",
+   "FID_COND_MRKT_DIV_CODE_24",
+   "FID_INPUT_ISCD_24",
+   "FID_COND_MRKT_DIV_CODE_25",
+   "FID_INPUT_ISCD_25",
+   "FID_COND_MRKT_DIV_CODE_26",
+   "FID_INPUT_ISCD_26",
+   "FID_COND_MRKT_DIV_CODE_27",
+   "FID_INPUT_ISCD_27",
+   "FID_COND_MRKT_DIV_CODE_28",
+   "FID_INPUT_ISCD_28",
+   "FID_COND_MRKT_DIV_CODE_29",
+   "FID_INPUT_ISCD_29",
+   "FID_COND_MRKT_DIV_CODE_30",
+   "FID_INPUT_ISCD_30"
+  ]
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-vi-status": {
+  "tr_id": "FHPST01390000",
+  "title": "[국내주식] 기본시세 > 변동성완화장치(VI) 현황[v1_국내주식-055]",
+  "params": {
+   "FID_DIV_CLS_CODE": "0",
+   "FID_COND_SCR_DIV_CODE": "20139",
+   "FID_MRKT_CLS_CODE": "0",
+   "FID_INPUT_ISCD": "",
+   "FID_RANK_SORT_CLS_CODE": "0",
+   "FID_INPUT_DATE_1": "",
+   "FID_TRGT_CLS_CODE": "",
+   "FID_TRGT_EXLS_CLS_CODE": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_vi_status/inquire_vi_status.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-member": {
+  "tr_id": "FHKST01010600",
+  "title": "[국내주식] 기본시세 > 주식현재가 회원사[v1_국내주식-013]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_member/inquire_member.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-investor": {
+  "tr_id": "FHKST01010900",
+  "title": "[국내주식] 기본시세 > 주식현재가 투자자[v1_국내주식-012]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_investor/inquire_investor.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/investor-trade-by-stock-daily": {
+  "tr_id": "FHPTJ04160001",
+  "title": "[국내주식] 시세분석  > 종목별 투자자매매동향(일별)[종목별 투자자매매동향(일별)]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_ORG_ADJ_PRC": "",
+   "FID_ETC_CLS_CODE": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/investor_trade_by_stock_daily/investor_trade_by_stock_daily.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/investor-trend-estimate": {
+  "tr_id": "HHPTJ04160200",
+  "title": "[국내주식] 시세분석 > 종목별 외인기관 추정가집계[v1_국내주식-046]",
+  "params": {
+   "MKSC_SHRN_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/investor_trend_estimate/investor_trend_estimate.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-investor-daily-by-market": {
+  "tr_id": "FHPTJ04040000",
+  "title": "[국내주식] 시세분석 > 시장별 투자자매매동향(일별) [국내주식-075]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "U",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_ISCD_1": "",
+   "FID_INPUT_DATE_2": "",
+   "FID_INPUT_ISCD_2": "0001"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_investor_daily_by_market/inquire_investor_daily_by_market.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-investor-time-by-market": {
+  "tr_id": "FHPTJ04030000",
+  "title": "[국내주식] 시세분석 > 시장별 투자자매매동향(시세)[v1_국내주식-074]",
+  "params": {
+   "FID_INPUT_ISCD": "999",
+   "FID_INPUT_ISCD_2": "S001"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_investor_time_by_market/inquire_investor_time_by_market.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/foreign-institution-total": {
+  "tr_id": "FHPTJ04400000",
+  "title": "[국내주식] 시세분석 > 국내기관_외국인 매매종목가집계[국내주식-037]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "V",
+   "FID_COND_SCR_DIV_CODE": "16449",
+   "FID_INPUT_ISCD": "0000",
+   "FID_DIV_CLS_CODE": "0",
+   "FID_RANK_SORT_CLS_CODE": "0",
+   "FID_ETC_CLS_CODE": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/foreign_institution_total/foreign_institution_total.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/frgnmem-trade-estimate": {
+  "tr_id": "FHKST644100C0",
+  "title": "[국내주식] 시세분석 > 외국계 매매종목 가집계 [국내주식-161]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_COND_SCR_DIV_CODE": "16441",
+   "FID_INPUT_ISCD": "0000",
+   "FID_RANK_SORT_CLS_CODE": "0",
+   "FID_RANK_SORT_CLS_CODE_2": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/frgnmem_trade_estimate/frgnmem_trade_estimate.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/program-trade-by-stock": {
+  "tr_id": "FHPPG04650101",
+  "title": "[국내주식] 시세분석 > 종목별 프로그램매매추이(체결)[v1_국내주식-044]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/program_trade_by_stock/program_trade_by_stock.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/program-trade-by-stock-daily": {
+  "tr_id": "FHPPG04650201",
+  "title": "[국내주식] 시세분석 > 종목별 프로그램매매추이(일별) [국내주식-113]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/program_trade_by_stock_daily/program_trade_by_stock_daily.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/comp-program-trade-daily": {
+  "tr_id": "FHPPG04600001",
+  "title": "[국내주식] 시세분석 > 프로그램매매 종합현황(일별)[국내주식-115]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_MRKT_CLS_CODE": "K",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/comp_program_trade_daily/comp_program_trade_daily.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/investor-program-trade-today": {
+  "tr_id": "HHPPG046600C1",
+  "title": "[국내주식] 시세분석 > 프로그램매매 투자자매매동향(당일) [국내주식-116]",
+  "params": {
+   "MRKT_DIV_CLS_CODE": "1"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/investor_program_trade_today/investor_program_trade_today.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/daily-short-sale": {
+  "tr_id": "FHPST04830000",
+  "title": "[국내주식] 시세분석 > 국내주식 공매도 일별추이[국내주식-134]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/daily_short_sale/daily_short_sale.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/daily-credit-balance": {
+  "tr_id": "FHPST04760000",
+  "title": "[국내주식] 시세분석 > 국내주식 신용잔고 일별추이[국내주식-110]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_COND_SCR_DIV_CODE": "20476",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/daily_credit_balance/daily_credit_balance.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/daily-loan-trans": {
+  "tr_id": "HHPST074500C0",
+  "title": "[국내주식] 시세분석 > 종목별 일별 대차거래추이 [국내주식-135]",
+  "params": {
+   "MRKT_DIV_CLS_CODE": "1",
+   "MKSC_SHRN_ISCD": "",
+   "START_DATE": "",
+   "END_DATE": "",
+   "CTS": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/daily_loan_trans/daily_loan_trans.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-index-price": {
+  "tr_id": "FHPUP02100000",
+  "title": "[국내주식] 업종/기타 > 국내업종 현재지수 [v1_국내주식-063]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "U",
+   "FID_INPUT_ISCD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_index_price/inquire_index_price.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-index-daily-price": {
+  "tr_id": "FHPUP02120000",
+  "title": "[국내주식] 업종/기타 > 국내업종 일자별지수 [v1_국내주식-065]",
+  "params": {
+   "FID_PERIOD_DIV_CODE": "D",
+   "FID_COND_MRKT_DIV_CODE": "U",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_index_daily_price/inquire_index_daily_price.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-daily-indexchartprice": {
+  "tr_id": "FHKUP03500100",
+  "title": "[국내주식] 업종/기타 - 국내주식업종기간별시세(일/주/월/년)",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "U",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": "",
+   "FID_PERIOD_DIV_CODE": "D"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_daily_indexchartprice/inquire_daily_indexchartprice.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-time-indexchartprice": {
+  "tr_id": "FHKUP03500200",
+  "title": "[국내주식] 업종/기타 - 업종 분봉조회",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "U",
+   "FID_ETC_CLS_CODE": "0",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_HOUR_1": "60",
+   "FID_PW_DATA_INCU_YN": "Y"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_time_indexchartprice/inquire_time_indexchartprice.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/inquire-index-category-price": {
+  "tr_id": "FHPUP02140000",
+  "title": "[국내주식] 업종/기타 > 국내업종 구분별전체시세[v1_국내주식-066]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "U",
+   "FID_INPUT_ISCD": "",
+   "FID_COND_SCR_DIV_CODE": "20214",
+   "FID_MRKT_CLS_CODE": "K",
+   "FID_BLNG_CLS_CODE": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/inquire_index_category_price/inquire_index_category_price.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/fluctuation": {
+  "tr_id": "FHPST01700000",
+  "title": "[국내주식] 순위분석 > 등락률 순위[v1_국내주식-088]",
+  "params": {
+   "fid_rsfl_rate2": "",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20170",
+   "fid_input_iscd": "0000",
+   "fid_rank_sort_cls_code": "0",
+   "fid_input_cnt_1": "0",
+   "fid_prc_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_input_price_2": "",
+   "fid_vol_cnt": "",
+   "fid_trgt_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0",
+   "fid_div_cls_code": "0",
+   "fid_rsfl_rate1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/fluctuation/fluctuation.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/volume-rank": {
+  "tr_id": "FHPST01710000",
+  "title": "[국내주식] 순위분석 > 거래량순위[v1_국내주식-047]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_COND_SCR_DIV_CODE": "20171",
+   "FID_INPUT_ISCD": "0000",
+   "FID_DIV_CLS_CODE": "0",
+   "FID_BLNG_CLS_CODE": "0",
+   "FID_TRGT_CLS_CODE": "111111111",
+   "FID_TRGT_EXLS_CLS_CODE": "0000000000",
+   "FID_INPUT_PRICE_1": "",
+   "FID_INPUT_PRICE_2": "",
+   "FID_VOL_CNT": "",
+   "FID_INPUT_DATE_1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/volume_rank/volume_rank.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/market-cap": {
+  "tr_id": "FHPST01740000",
+  "title": "[국내주식] 순위분석 > 국내주식 시가총액 상위 [v1_국내주식-091]",
+  "params": {
+   "fid_input_price_2": "",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20174",
+   "fid_div_cls_code": "0",
+   "fid_input_iscd": "0000",
+   "fid_trgt_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_vol_cnt": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/market_cap/market_cap.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/market-value": {
+  "tr_id": "FHPST01790000",
+  "title": "[국내주식] 순위분석 > 국내주식 시장가치 순위[v1_국내주식-096]",
+  "params": {
+   "fid_trgt_cls_code": "0",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20179",
+   "fid_input_iscd": "0000",
+   "fid_div_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_input_price_2": "",
+   "fid_vol_cnt": "",
+   "fid_input_option_1": "2023",
+   "fid_input_option_2": "0",
+   "fid_rank_sort_cls_code": "23",
+   "fid_blng_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/market_value/market_value.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/profit-asset-index": {
+  "tr_id": "FHPST01730000",
+  "title": "[국내주식] 순위분석 > 국내주식 수익자산지표 순위[v1_국내주식-090]",
+  "params": {
+   "fid_cond_mrkt_div_code": "J",
+   "fid_trgt_cls_code": "0",
+   "fid_cond_scr_div_code": "20173",
+   "fid_input_iscd": "0000",
+   "fid_div_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_input_price_2": "",
+   "fid_vol_cnt": "",
+   "fid_input_option_1": "2023",
+   "fid_input_option_2": "0",
+   "fid_rank_sort_cls_code": "0",
+   "fid_blng_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/profit_asset_index/profit_asset_index.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/near-new-highlow": {
+  "tr_id": "FHPST01870000",
+  "title": "[국내주식] 순위분석 > 국내주식 신고_신저근접종목 상위[v1_국내주식-105]",
+  "params": {
+   "fid_aply_rang_vol": "",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20187",
+   "fid_div_cls_code": "0",
+   "fid_input_cnt_1": "0",
+   "fid_input_cnt_2": "10",
+   "fid_prc_cls_code": "0",
+   "fid_input_iscd": "0000",
+   "fid_trgt_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0",
+   "fid_aply_rang_prc_1": "",
+   "fid_aply_rang_prc_2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/near_new_highlow/near_new_highlow.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/credit-balance": {
+  "tr_id": "FHKST17010000",
+  "title": "[국내주식] 순위분석 > 국내주식 신용잔고 상위 [국내주식-109]",
+  "params": {
+   "FID_COND_SCR_DIV_CODE": "11701",
+   "FID_INPUT_ISCD": "0000",
+   "FID_OPTION": "2",
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_RANK_SORT_CLS_CODE": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/credit_balance/credit_balance.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/short-sale": {
+  "tr_id": "FHPST04820000",
+  "title": "[국내주식] 순위분석 > 국내주식 공매도 상위종목[국내주식-133]",
+  "params": {
+   "FID_APLY_RANG_VOL": "",
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_COND_SCR_DIV_CODE": "20482",
+   "FID_INPUT_ISCD": "0000",
+   "FID_PERIOD_DIV_CODE": "D",
+   "FID_INPUT_CNT_1": "0",
+   "FID_TRGT_EXLS_CLS_CODE": "",
+   "FID_TRGT_CLS_CODE": "",
+   "FID_APLY_RANG_PRC_1": "",
+   "FID_APLY_RANG_PRC_2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/short_sale/short_sale.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/disparity": {
+  "tr_id": "FHPST01780000",
+  "title": "[국내주식] 순위분석 > 국내주식 이격도 순위 [v1_국내주식-095]",
+  "params": {
+   "fid_input_price_2": "",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20178",
+   "fid_div_cls_code": "0",
+   "fid_rank_sort_cls_code": "0",
+   "fid_hour_cls_code": "5",
+   "fid_input_iscd": "0000",
+   "fid_trgt_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_vol_cnt": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/disparity/disparity.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/dividend-rate": {
+  "tr_id": "HHKDB13470100",
+  "title": "[국내주식] 순위분석 > 국내주식 배당률 상위[국내주식-106]",
+  "params": {
+   "CTS_AREA": "",
+   "GB1": "0",
+   "UPJONG": "0001",
+   "GB2": "0",
+   "GB3": "2",
+   "F_DT": "",
+   "T_DT": "",
+   "GB4": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/dividend_rate/dividend_rate.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/volume-power": {
+  "tr_id": "FHPST01680000",
+  "title": "[국내주식] 순위분석 > 국내주식 체결강도 상위[v1_국내주식-101]",
+  "params": {
+   "fid_trgt_exls_cls_code": "0",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20168",
+   "fid_input_iscd": "0000",
+   "fid_div_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_input_price_2": "",
+   "fid_vol_cnt": "",
+   "fid_trgt_cls_code": "0"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/volume_power/volume_power.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/bulk-trans-num": {
+  "tr_id": "FHKST190900C0",
+  "title": "[국내주식] 순위분석 > 국내주식 대량체결건수 상위[국내주식-107]",
+  "params": {
+   "fid_aply_rang_prc_2": "",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "11909",
+   "fid_input_iscd": "0000",
+   "fid_rank_sort_cls_code": "0",
+   "fid_div_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_aply_rang_prc_1": "",
+   "fid_input_iscd_2": "",
+   "fid_trgt_exls_cls_code": "0",
+   "fid_trgt_cls_code": "0",
+   "fid_vol_cnt": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/bulk_trans_num/bulk_trans_num.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/top-interest-stock": {
+  "tr_id": "FHPST01800000",
+  "title": "[국내주식] 순위분석 > 국내주식 관심종목등록 상위[v1_국내주식-102]",
+  "params": {
+   "fid_input_iscd_2": "000000",
+   "fid_cond_mrkt_div_code": "J",
+   "fid_cond_scr_div_code": "20180",
+   "fid_input_iscd": "0000",
+   "fid_trgt_cls_code": "0",
+   "fid_trgt_exls_cls_code": "0",
+   "fid_input_price_1": "",
+   "fid_input_price_2": "",
+   "fid_vol_cnt": "",
+   "fid_div_cls_code": "0",
+   "fid_input_cnt_1": "1"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/top_interest_stock/top_interest_stock.py"
+ },
+ "/uapi/domestic-stock/v1/ranking/hts-top-view": {
+  "tr_id": "HHMCM000100C0",
+  "title": "[국내주식] 순위분석 > HTS조회상위20종목[국내주식-214]",
+  "params": {},
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/hts_top_view/hts_top_view.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/search-stock-info": {
+  "tr_id": "CTPF1002R",
+  "title": "[국내주식] 종목정보 - 주식기본조회",
+  "params": {
+   "PRDT_TYPE_CD": "300",
+   "PDNO": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/search_stock_info/search_stock_info.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/search-info": {
+  "tr_id": "CTPF1604R",
+  "title": "[국내주식] 종목정보 - 상품기본조회",
+  "params": {
+   "PDNO": "",
+   "PRDT_TYPE_CD": "300"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/search_info/search_info.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/estimate-perform": {
+  "tr_id": "HHKST668300C0",
+  "title": "[국내주식] 종목정보 > 국내주식 종목추정실적[국내주식-187]",
+  "params": {
+   "SHT_CD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/estimate_perform/estimate_perform.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/invest-opinion": {
+  "tr_id": "FHKST663300C0",
+  "title": "[국내주식] 종목정보 - 국내주식 종목투자의견",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_COND_SCR_DIV_CODE": "16633",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/invest_opinion/invest_opinion.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/invest-opbysec": {
+  "tr_id": "FHKST663400C0",
+  "title": "[국내주식] 종목정보 - 국내주식 증권사별 투자의견",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "J",
+   "FID_COND_SCR_DIV_CODE": "16634",
+   "FID_INPUT_ISCD": "",
+   "FID_DIV_CLS_CODE": "0",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/invest_opbysec/invest_opbysec.py"
+ },
+ "/uapi/domestic-stock/v1/ksdinfo/dividend": {
+  "tr_id": "HHKDB669102C0",
+  "title": "[국내주식] 종목정보 - 예탁원정보(배당일정)",
+  "params": {
+   "CTS": "",
+   "GB1": "0",
+   "F_DT": "",
+   "T_DT": "",
+   "SHT_CD": "",
+   "HIGH_GB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/ksdinfo_dividend/ksdinfo_dividend.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/news-title": {
+  "tr_id": "FHKST01011800",
+  "title": "[국내주식] 업종/기타 - 종합 시황/공시(제목)",
+  "params": {
+   "FID_NEWS_OFER_ENTP_CODE": "",
+   "FID_COND_MRKT_CLS_CODE": "",
+   "FID_INPUT_ISCD": "",
+   "FID_TITL_CNTT": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_HOUR_1": "",
+   "FID_RANK_SORT_CLS_CODE": "",
+   "FID_INPUT_SRNO": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/news_title/news_title.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/chk-holiday": {
+  "tr_id": "CTCA0903R",
+  "title": "[국내주식] 업종/기타 > 국내휴장일조회[국내주식-040]",
+  "params": {
+   "BASS_DT": "",
+   "CTX_AREA_FK": "",
+   "CTX_AREA_NK": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/chk_holiday/chk_holiday.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/comp-interest": {
+  "tr_id": "FHPST07020000",
+  "title": "[국내주식] 업종/기타 > 금리 종합(국내채권_금리)[국내주식-155]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "I",
+   "FID_COND_SCR_DIV_CODE": "20702",
+   "FID_DIV_CLS_CODE": "1",
+   "FID_DIV_CLS_CODE1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/comp_interest/comp_interest.py"
+ },
+ "/uapi/domestic-stock/v1/quotations/mktfunds": {
+  "tr_id": "FHKST649100C0",
+  "title": "[국내주식] 시세분석 > 국내 증시자금 종합 [국내주식-193]",
+  "params": {
+   "FID_INPUT_DATE_1": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/domestic_stock/mktfunds/mktfunds.py"
+ },
+ "/uapi/overseas-price/v1/quotations/price": {
+  "tr_id": "HHDFS00000300",
+  "title": "[해외주식] 기본시세 - 해외주식 현재체결가",
+  "params": {
+   "AUTH": "",
+   "EXCD": "",
+   "SYMB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/price/price.py"
+ },
+ "/uapi/overseas-price/v1/quotations/price-detail": {
+  "tr_id": "HHDFS76200200",
+  "title": "[해외주식] 기본시세 > 해외주식 현재가상세[v1_해외주식-029]",
+  "params": {
+   "AUTH": "",
+   "EXCD": "",
+   "SYMB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/price_detail/price_detail.py"
+ },
+ "/uapi/overseas-price/v1/quotations/inquire-asking-price": {
+  "tr_id": "HHDFS76200100",
+  "title": "[해외주식] 기본시세 > 해외주식 현재가 1호가[해외주식-033]",
+  "params": {
+   "AUTH": "",
+   "EXCD": "",
+   "SYMB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_asking_price/inquire_asking_price.py"
+ },
+ "/uapi/overseas-price/v1/quotations/dailyprice": {
+  "tr_id": "HHDFS76240000",
+  "title": "[해외주식] 기본시세 > 해외주식 기간별시세[v1_해외주식-010]",
+  "params": {
+   "AUTH": "",
+   "EXCD": "",
+   "SYMB": "",
+   "GUBN": "0",
+   "BYMD": "",
+   "MODP": "1"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/dailyprice/dailyprice.py"
+ },
+ "/uapi/overseas-price/v1/quotations/inquire-time-itemchartprice": {
+  "tr_id": "HHDFS76950200",
+  "title": "[해외주식] 기본시세 > 해외주식분봉조회[v1_해외주식-030]",
+  "params": {
+   "AUTH": "",
+   "EXCD": "",
+   "SYMB": "",
+   "NMIN": "5",
+   "PINC": "1",
+   "NEXT": "",
+   "NREC": "120",
+   "FILL": "",
+   "KEYB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_time_itemchartprice/inquire_time_itemchartprice.py"
+ },
+ "/uapi/overseas-price/v1/quotations/search-info": {
+  "tr_id": "CTPF1702R",
+  "title": "[해외주식] 시세분석 > 해외주식 상품기본정보[v1_해외주식-034]",
+  "params": {
+   "PRDT_TYPE_CD": "512",
+   "PDNO": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/search_info/search_info.py"
+ },
+ "/uapi/overseas-price/v1/quotations/inquire-daily-chartprice": {
+  "tr_id": "FHKST03030100",
+  "title": "[해외주식] 기본시세 > 해외주식 종목_지수_환율기간별시세(일_주_월_년)[v1_해외주식-012]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "N",
+   "FID_INPUT_ISCD": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_DATE_2": "",
+   "FID_PERIOD_DIV_CODE": "D"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_daily_chartprice/inquire_daily_chartprice.py"
+ },
+ "/uapi/overseas-price/v1/quotations/inquire-time-indexchartprice": {
+  "tr_id": "FHKST03030200",
+  "title": "[해외주식] 기본시세 > 해외지수분봉조회[v1_해외주식-031]",
+  "params": {
+   "FID_COND_MRKT_DIV_CODE": "N",
+   "FID_INPUT_ISCD": "",
+   "FID_HOUR_CLS_CODE": "0",
+   "FID_PW_DATA_INCU_YN": "Y"
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_time_indexchartprice/inquire_time_indexchartprice.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/updown-rate": {
+  "tr_id": "HHDFS76290000",
+  "title": "[해외주식] 시세분석 > 해외주식 상승률/하락률[해외주식-041]",
+  "params": {
+   "EXCD": "",
+   "NDAY": "0",
+   "GUBN": "1",
+   "VOL_RANG": "0",
+   "AUTH": "",
+   "KEYB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/updown_rate/updown_rate.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/price-fluct": {
+  "tr_id": "HHDFS76260000",
+  "title": "[해외주식] 시세분석 > 해외주식 가격급등락[해외주식-038]",
+  "params": {
+   "EXCD": "",
+   "GUBN": "0",
+   "MINX": "0",
+   "VOL_RANG": "0",
+   "KEYB": "",
+   "AUTH": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/price_fluct/price_fluct.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/volume-surge": {
+  "tr_id": "HHDFS76270000",
+  "title": "[해외주식] 시세분석 > 해외주식 거래량급증[해외주식-039]",
+  "params": {
+   "EXCD": "",
+   "MINX": "0",
+   "VOL_RANG": "0",
+   "KEYB": "",
+   "AUTH": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/volume_surge/volume_surge.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/trade-vol": {
+  "tr_id": "HHDFS76310010",
+  "title": "[해외주식] 시세분석 > 해외주식 거래량순위[해외주식-043]",
+  "params": {
+   "EXCD": "",
+   "NDAY": "0",
+   "VOL_RANG": "0",
+   "KEYB": "",
+   "AUTH": "",
+   "PRC1": "",
+   "PRC2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/trade_vol/trade_vol.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/trade-pbmn": {
+  "tr_id": "HHDFS76320010",
+  "title": "[해외주식] 시세분석 > 해외주식 거래대금순위[해외주식-044]",
+  "params": {
+   "EXCD": "",
+   "NDAY": "0",
+   "VOL_RANG": "0",
+   "AUTH": "",
+   "KEYB": "",
+   "PRC1": "",
+   "PRC2": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/trade_pbmn/trade_pbmn.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/trade-growth": {
+  "tr_id": "HHDFS76330000",
+  "title": "[해외주식] 시세분석 > 해외주식 거래증가율순위[해외주식-045]",
+  "params": {
+   "EXCD": "",
+   "NDAY": "0",
+   "VOL_RANG": "0",
+   "AUTH": "",
+   "KEYB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/trade_growth/trade_growth.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/trade-turnover": {
+  "tr_id": "HHDFS76340000",
+  "title": "[해외주식] 시세분석 > 해외주식 거래회전율순위[해외주식-046]",
+  "params": {
+   "EXCD": "",
+   "NDAY": "0",
+   "VOL_RANG": "0",
+   "KEYB": "",
+   "AUTH": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/trade_turnover/trade_turnover.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/market-cap": {
+  "tr_id": "HHDFS76350100",
+  "title": "[해외주식] 시세분석 > 해외주식 시가총액순위[해외주식-047]",
+  "params": {
+   "EXCD": "",
+   "VOL_RANG": "1",
+   "KEYB": "",
+   "AUTH": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/market_cap/market_cap.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/new-highlow": {
+  "tr_id": "HHDFS76300000",
+  "title": "[해외주식] 시세분석 > 해외주식 신고/신저가[해외주식-042]",
+  "params": {
+   "EXCD": "",
+   "MINX": "0",
+   "VOL_RANG": "0",
+   "GUBN": "1",
+   "GUBN2": "1",
+   "KEYB": "",
+   "AUTH": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/new_highlow/new_highlow.py"
+ },
+ "/uapi/overseas-stock/v1/ranking/volume-power": {
+  "tr_id": "HHDFS76280000",
+  "title": "[해외주식] 시세분석 > 해외주식 매수체결강도상위[해외주식-040]",
+  "params": {
+   "EXCD": "",
+   "NDAY": "0",
+   "VOL_RANG": "0",
+   "AUTH": "",
+   "KEYB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/volume_power/volume_power.py"
+ },
+ "/uapi/overseas-price/v1/quotations/inquire-search": {
+  "tr_id": "HHDFS76410000",
+  "title": "[해외주식] 시세분석 > 해외주식조건검색[v1_해외주식-015]",
+  "params": {
+   "AUTH": "",
+   "EXCD": "",
+   "CO_YN_PRICECUR": "",
+   "CO_ST_PRICECUR": "",
+   "CO_EN_PRICECUR": "",
+   "CO_YN_RATE": "",
+   "CO_ST_RATE": "",
+   "CO_EN_RATE": "",
+   "CO_YN_VALX": "",
+   "CO_ST_VALX": "",
+   "CO_EN_VALX": "",
+   "CO_YN_SHAR": "",
+   "CO_ST_SHAR": "",
+   "CO_EN_SHAR": "",
+   "CO_YN_VOLUME": "",
+   "CO_ST_VOLUME": "",
+   "CO_EN_VOLUME": "",
+   "CO_YN_AMT": "",
+   "CO_ST_AMT": "",
+   "CO_EN_AMT": "",
+   "CO_YN_EPS": "",
+   "CO_ST_EPS": "",
+   "CO_EN_EPS": "",
+   "CO_YN_PER": "",
+   "CO_ST_PER": "",
+   "CO_EN_PER": "",
+   "KEYB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/inquire_search/inquire_search.py"
+ },
+ "/uapi/overseas-price/v1/quotations/industry-price": {
+  "tr_id": "HHDFS76370100",
+  "title": "[해외주식] 기본시세 > 해외주식 업종별코드조회[해외주식-049]",
+  "params": {
+   "EXCD": "",
+   "AUTH": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/industry_price/industry_price.py"
+ },
+ "/uapi/overseas-price/v1/quotations/industry-theme": {
+  "tr_id": "HHDFS76370000",
+  "title": "[해외주식] 기본시세 > 해외주식 업종별시세[해외주식-048]",
+  "params": {
+   "EXCD": "",
+   "ICOD": "",
+   "VOL_RANG": "0",
+   "AUTH": "",
+   "KEYB": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/industry_theme/industry_theme.py"
+ },
+ "/uapi/overseas-price/v1/quotations/news-title": {
+  "tr_id": "HHPSTH60100C1",
+  "title": "[해외주식] 시세분석 > 해외뉴스종합(제목) [해외주식-053]",
+  "params": {
+   "INFO_GB": "",
+   "CLASS_CD": "",
+   "NATION_CD": "",
+   "EXCHANGE_CD": "",
+   "SYMB": "",
+   "DATA_DT": "",
+   "DATA_TM": "",
+   "CTS": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/news_title/news_title.py"
+ },
+ "/uapi/overseas-price/v1/quotations/brknews-title": {
+  "tr_id": "FHKST01011801",
+  "title": "[해외주식] 시세분석 > 해외속보(제목) [해외주식-055]",
+  "params": {
+   "FID_NEWS_OFER_ENTP_CODE": "0",
+   "FID_COND_SCR_DIV_CODE": "11801",
+   "FID_COND_MRKT_CLS_CODE": "",
+   "FID_INPUT_ISCD": "",
+   "FID_TITL_CNTT": "",
+   "FID_INPUT_DATE_1": "",
+   "FID_INPUT_HOUR_1": "",
+   "FID_RANK_SORT_CLS_CODE": "",
+   "FID_INPUT_SRNO": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/brknews_title/brknews_title.py"
+ },
+ "/uapi/overseas-stock/v1/quotations/countries-holiday": {
+  "tr_id": "CTOS5011R",
+  "title": "[해외주식] 기본시세 > 해외결제일자조회[해외주식-017]",
+  "params": {
+   "TRAD_DT": "",
+   "CTX_AREA_NK": "",
+   "CTX_AREA_FK": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/countries_holiday/countries_holiday.py"
+ },
+ "/uapi/overseas-price/v1/quotations/period-rights": {
+  "tr_id": "CTRGT011R",
+  "title": "[해외주식] 시세분석 > 해외주식 기간별권리조회 [해외주식-052]",
+  "params": {
+   "RGHT_TYPE_CD": "%%",
+   "INQR_DVSN_CD": "02",
+   "INQR_STRT_DT": "",
+   "INQR_END_DT": "",
+   "PDNO": "",
+   "PRDT_TYPE_CD": "",
+   "CTX_AREA_NK50": "",
+   "CTX_AREA_FK50": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/period_rights/period_rights.py"
+ },
+ "/uapi/overseas-price/v1/quotations/rights-by-ice": {
+  "tr_id": "HHDFS78330900",
+  "title": "[해외주식] 시세분석 > 해외주식 권리종합 [해외주식-050]",
+  "params": {
+   "NCOD": "",
+   "SYMB": "",
+   "ST_YMD": "",
+   "ED_YMD": ""
+  },
+  "example": "https://github.com/koreainvestment/open-trading-api/blob/main/examples_llm/overseas_stock/rights_by_ice/rights_by_ice.py"
+ }
+}
