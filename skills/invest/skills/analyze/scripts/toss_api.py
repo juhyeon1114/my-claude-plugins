@@ -22,6 +22,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from env_file import ENV_FILE, read_env_file
+
 BASE_URL = "https://openapi.tossinvest.com"
 TOKEN_URL = f"{BASE_URL}/oauth2/token"
 
@@ -92,9 +94,10 @@ def is_allowed_path(path):
 
 
 def load_credentials():
-    """환경 변수, 없으면 자격 증명 파일에서 client_id 와 client_secret 을 읽는다"""
-    client_id = os.environ.get("TOSS_CLIENT_ID")
-    client_secret = os.environ.get("TOSS_CLIENT_SECRET")
+    """환경 변수, .env 파일, 자격 증명 파일 순서로 client_id 와 client_secret 을 읽는다"""
+    values = {**read_env_file(), **os.environ}
+    client_id = values.get("TOSS_CLIENT_ID")
+    client_secret = values.get("TOSS_CLIENT_SECRET")
     if client_id and client_secret:
         return client_id, client_secret
 
@@ -104,7 +107,8 @@ def load_credentials():
             return saved["client_id"], saved["client_secret"]
 
     fail(
-        "자격 증명이 없습니다. 환경 변수 TOSS_CLIENT_ID, TOSS_CLIENT_SECRET 을 설정하거나 "
+        "자격 증명이 없습니다. 환경 변수나 "
+        f"{ENV_FILE} 에 TOSS_CLIENT_ID, TOSS_CLIENT_SECRET 을 넣거나, "
         f"{CREDENTIALS_FILE} 에 {{\"client_id\": ..., \"client_secret\": ...}} 를 저장하세요."
     )
 

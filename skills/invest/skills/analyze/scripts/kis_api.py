@@ -23,6 +23,8 @@ import urllib.parse
 import urllib.request
 from pathlib import Path
 
+from env_file import ENV_FILE, read_env_file
+
 BASE_URL = "https://openapi.koreainvestment.com:9443"
 TOKEN_URL = f"{BASE_URL}/oauth2/tokenP"
 
@@ -57,9 +59,10 @@ def fail(message):
 
 
 def load_credentials():
-    """환경 변수, 없으면 자격 증명 파일에서 앱키와 앱시크릿을 읽는다"""
-    app_key = os.environ.get("KIS_APP_KEY")
-    app_secret = os.environ.get("KIS_APP_SECRET")
+    """환경 변수, .env 파일, 자격 증명 파일 순서로 앱키와 앱시크릿을 읽는다"""
+    values = {**read_env_file(), **os.environ}
+    app_key = values.get("KIS_APP_KEY")
+    app_secret = values.get("KIS_APP_SECRET")
     if app_key and app_secret:
         return app_key, app_secret
 
@@ -69,7 +72,8 @@ def load_credentials():
             return saved["app_key"], saved["app_secret"]
 
     fail(
-        "자격 증명이 없습니다. 환경 변수 KIS_APP_KEY, KIS_APP_SECRET 을 설정하거나 "
+        "자격 증명이 없습니다. 환경 변수나 "
+        f"{ENV_FILE} 에 KIS_APP_KEY, KIS_APP_SECRET 을 넣거나, "
         f"{CREDENTIALS_FILE} 에 {{\"app_key\": ..., \"app_secret\": ...}} 를 저장하세요."
     )
 

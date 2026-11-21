@@ -22,7 +22,7 @@
 
 1. 토스증권 WTS에 로그인해 `설정 > Open API` 에서 `client_id` 와 `client_secret` 을 발급받는다.
 2. 같은 메뉴의 `허용 IP 관리` 에 API를 호출할 PC의 공인 IP를 등록한다. 유동 IP는 차단된다.
-3. 환경 변수 `TOSS_CLIENT_ID`, `TOSS_CLIENT_SECRET` 을 셸 프로필에 넣거나, `~/.config/toss-invest/credentials.json` 에 `{"client_id": "...", "client_secret": "..."}` 를 저장하고 권한을 `600` 으로 둔다.
+3. `~/.claude/.env` 에 `TOSS_CLIENT_ID=...`, `TOSS_CLIENT_SECRET=...` 를 넣는다. 셸 환경 변수로 넣거나 `~/.config/toss-invest/credentials.json` 에 `{"client_id": "...", "client_secret": "..."}` 를 저장해도 된다. 파일 권한은 `600` 으로 둔다.
 
 스크립트가 토큰을 새로 받으면 같은 키로 받은 다른 토큰은 무효가 되므로, 사용자가 같은 키를 다른 프로그램에서 쓰면 알린다.
 

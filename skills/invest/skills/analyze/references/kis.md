@@ -21,7 +21,7 @@
 `kis_api.py` 가 자격 증명이 없다고 하면, 사용자에게 아래 순서를 안내하고 멈춘다. 자격 증명 값을 채팅으로 받지 않는다.
 
 1. 한국투자증권 계좌를 열고, KIS Developers에서 Open API를 신청해 실전투자용 App Key와 App Secret을 발급받는다.
-2. 환경 변수 `KIS_APP_KEY`, `KIS_APP_SECRET` 을 셸 프로필에 넣거나, `~/.config/kis/credentials.json` 에 `{"app_key": "...", "app_secret": "..."}` 를 저장하고 권한을 `600` 으로 둔다.
+2. `~/.claude/.env` 에 `KIS_APP_KEY=...`, `KIS_APP_SECRET=...` 를 넣는다. 셸 환경 변수로 넣거나 `~/.config/kis/credentials.json` 에 `{"app_key": "...", "app_secret": "..."}` 를 저장해도 된다. 파일 권한은 `600` 으로 둔다.
 
 토큰은 1분에 한 번만 발급되고 발급할 때마다 사용자에게 알림톡이 가므로, 스크립트가 캐시한 토큰(`~/.cache/kis/token.json`)을 지우지 않는다.
 
