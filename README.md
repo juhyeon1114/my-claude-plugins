@@ -114,8 +114,8 @@ GitHub PR을 리뷰하거나 PR 글을 쓴다. 결과는 채팅으로만 보여�
 |---|---|---|
 | 토스증권 | 국내와 미국 종목 시세, 국내 수급, 섹터 | API 조회 |
 | KIS | 해외 지수, 환율, 업종 지수, 투자의견 | API 조회 |
-| Finviz | 미국 스크리너, 히트맵 | 링크만(https://finviz.com/) |
-| CNN | 공포탐욕지수 | 링크만(https://edition.cnn.com/markets/fear-and-greed) |
+| Finviz | 미국 스크리너, 히트맵 | 브라우저로 페이지를 열어 읽음(https://finviz.com/) |
+| CNN | 공포탐욕지수 | Claude in Chrome으로 페이지를 열어 읽음(https://edition.cnn.com/markets/fear-and-greed) |
 
 - `/invest:analyze`: 질문에 맞는 출처와 API를 골라 데이터를 받고, Python으로 계산해 분석 결과를 보여준다.
 - 주문, 정정, 취소, 조건주문 같은 거래 API와 계좌 조회 API는 호출하지 않는다. 조회 스크립트도 허용한 시세 경로만 보낸다.
