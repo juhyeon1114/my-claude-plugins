@@ -108,10 +108,16 @@ GitHub PR을 리뷰하거나 PR 글을 쓴다. 결과는 채팅으로만 보여�
 - 점검만 하라고 하면 고치지 않고 표로 보고한다.
 
 ## 8) invest
-토스증권 Open API, 한국투자증권(KIS) Open API, Finviz로 국내와 미국 시장, 종목을 분석한다. "오늘 시장 어때", "삼성전자 수급 봐줘", "미국 저평가 종목 찾아줘"처럼 말해도 동작한다.
+국내와 미국 시장, 종목을 분석한다. "오늘 시장 어때", "삼성전자 수급 봐줘", "미국 저평가 종목 찾아줘"처럼 말해도 동작한다.
+
+| 출처 | 쓰는 데이터 | 받는 방식 |
+|---|---|---|
+| 토스증권 | 국내와 미국 종목 시세, 국내 수급, 섹터 | API 조회 |
+| KIS | 해외 지수, 환율, 업종 지수, 투자의견 | API 조회 |
+| Finviz | 미국 스크리너, 히트맵 | 링크만(https://finviz.com/) |
+| CNN | 공포탐욕지수 | 링크만(https://edition.cnn.com/markets/fear-and-greed) |
 
 - `/invest:analyze`: 질문에 맞는 출처와 API를 골라 데이터를 받고, Python으로 계산해 분석 결과를 보여준다.
-- 토스증권은 국내 수급과 섹터, KIS는 해외 지수, 환율, 업종 지수, 투자의견에 쓴다. Finviz는 미국 스크리너와 히트맵 링크만 만들어 준다.
 - 주문, 정정, 취소, 조건주문 같은 거래 API와 계좌 조회 API는 호출하지 않는다. 조회 스크립트도 허용한 시세 경로만 보낸다.
 - 토스증권: WTS의 `설정 > Open API`에서 발급한 키를 `~/.claude/.env`의 `TOSS_CLIENT_ID`, `TOSS_CLIENT_SECRET`(또는 같은 이름의 환경 변수나 `~/.config/toss-invest/credentials.json`)에 넣고, 호출할 PC의 IP를 허용 IP 목록에 등록해야 한다.
 - KIS: KIS Developers에서 발급한 실전 App Key를 `~/.claude/.env`의 `KIS_APP_KEY`, `KIS_APP_SECRET`(또는 같은 이름의 환경 변수나 `~/.config/kis/credentials.json`)에 넣어야 한다.
