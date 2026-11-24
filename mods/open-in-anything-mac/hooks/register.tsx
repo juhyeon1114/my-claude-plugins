@@ -13,7 +13,7 @@ const SWITCH_APP_BUTTON = 'switch-app'
 const SPARE_SESSION_DIR = '/.claude/spares/'
 
 /** 폴더가 이 개수를 넘으면 버튼 대신 선택 상자 하나로 보여준다 */
-const MAX_FOLDER_BUTTONS = 5
+const MAX_FOLDER_BUTTONS = 4
 /** 선택 상자에서 아무 폴더도 고르지 않은 상태를 나타내는 값 */
 const SELECT_PLACEHOLDER = ''
 const SELECT_PLACEHOLDER_LABEL = '폴더 열기'

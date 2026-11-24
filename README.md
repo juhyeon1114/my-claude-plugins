@@ -50,7 +50,7 @@ claude plugin install invest@juhyeon1114
 - 맨 앞의 버튼을 누를 때마다 여는 앱이 `IJ`, `VS`, `Term`, `GH` 순서로 바뀐다. 고른 앱은 다음 세션에도 유지된다.
 - `Term`을 고르면 macOS 기본 터미널 앱에서 그 폴더로 새 창이 열린다.
 - `GH`를 고르면 그 폴더가 속한 GitHub 저장소 페이지가 기본 브라우저로 열린다. git 원격 `origin`이 GitHub 주소여야 한다.
-- 폴더가 5개를 넘으면 버튼 대신 선택 상자 하나로 나온다.
+- 폴더가 4개를 넘으면 버튼 대신 선택 상자 하나로 나온다.
 - 쓰려는 IDE(IntelliJ IDEA, Visual Studio Code)가 설치되어 있어야 한다.
 
 ## 2) contents-index
